@@ -1,30 +1,37 @@
 /* TEST_1.CSS - Stylizacja Karty Charakterystyki Pompy (Motyw Dark Engineering) */
 
 body {
-    background-color: #0a0f14; /* Bardzo ciemne tło */
-    color: #c0c5ce; /* Jasnoszary/srebrny tekst */
+    background-color: #0a0f14;
+    /* Bardzo ciemne tło */
+    color: #c0c5ce;
+    /* Jasnoszary/srebrny tekst */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6; /* Poprawa czytelności */
+    line-height: 1.6;
+    /* Poprawa czytelności */
     margin: 0;
     padding: 20px;
 }
 
 #main-document {
     max-width: 900px;
-    margin: 0 auto; /* Wyśrodkowanie */
+    margin: 0 auto;
+    /* Wyśrodkowanie */
     padding: 30px;
     box-sizing: border-box;
-    background-color: #121a24; /* Lekko jaśniejsze tło kontenera */
-    border: 2px solid #238636; /* Zielony terminalowy akcent */
+    background-color: #121a24;
+    /* Lekko jaśniejsze tło kontenera */
+    border: 2px solid #238636;
+    /* Zielony terminalowy akcent */
     border-radius: 8px;
 }
 
 /* Nagłówek z Flexbox */
-#main-document > .header-flex > h1 {
+#main-document>.header-flex>h1 {
     margin: 0;
     font-weight: 700;
     font-size: 2.2rem;
-    color: #58a6ff; /* Niebieski akcent */
+    color: #58a6ff;
+    /* Niebieski akcent */
 }
 
 .header-flex {
@@ -36,22 +43,25 @@ body {
 
 .status-active {
     font-weight: 600;
-    color: #238636; /* Zielony akcent */
+    color: #238636;
+    /* Zielony akcent */
     font-size: 1rem;
     font-family: monospace;
 }
 
 /* Style sekcji */
 section {
-    border: 2px solid #238636; /* Zielona ramka */
+    border: 2px solid #0000ff;
+    /* Zielona ramka */
     padding: 20px;
     margin-bottom: 30px;
     border-radius: 6px;
 }
 
 /* Tytuły sekcji */
-section > h2 {
-    color: #58a6ff; /* Niebieski nagłówek sekcji */
+section>h2 {
+    color: #58a6ff;
+    /* Niebieski nagłówek sekcji */
     margin-top: 0;
 }
 
@@ -63,8 +73,10 @@ table {
 }
 
 thead th {
-    background-color: #1f2937; /* Ciemnoniebieski / grafitowy */
-    color: #58a6ff; /* Niebieski */
+    background-color: #1f2937;
+    /* Ciemnoniebieski / grafitowy */
+    color: #58a6ff;
+    /* Niebieski */
     padding: 10px 12px;
     text-align: left;
 }
@@ -81,7 +93,8 @@ tbody tr:nth-child(even) {
 
 /* Wartości wyróżnione */
 .highlight {
-    color: #7fff00; /* Jaskrawozielony */
+    color: #7fff00;
+    /* Jaskrawozielony */
     font-weight: bold;
 }
 
@@ -115,7 +128,7 @@ footer p {
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .status-active {
         font-size: 0.9rem;
     }
