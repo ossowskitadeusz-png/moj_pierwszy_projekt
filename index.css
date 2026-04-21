@@ -1,0 +1,65 @@
+/* To jest plik index.css */
+
+body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Inter', sans-serif; /* Nowa, profesjonalna czcionka */
+    line-height: 1.6;                 /* Większy odstęp między liniami dla czytelności */
+    padding: 20px;
+}
+
+#main-report {
+    background-color: #161b22; /* Trochę jaśniejszy blok */
+    border: 2px solid #30363d;  /* Delikatna ramka */
+    padding: 30px;             /* Odstęp wewnętrzny - tekst nie dotyka ramki */
+    margin: 20px auto;        /* Margines zewnętrzny - 20px od góry, 'auto' wycentruje raport */
+    max-width: 800px;         /* Maksymalna szerokość raportu */
+}
+
+/* Flexbox Engine */
+.header-flex {
+    display: flex;
+    justify-content: space-between; /* Rozpycha elementy na boki */
+    align-items: center;           /* Wyśrodkowuje w pionie */
+}
+
+.report-date {
+    color: #8b949e;
+    font-style: italic;
+    margin: 0; /* Usuwamy domyślny margines p, żeby flex działał idealnie */
+}
+
+.data-section {
+    border-left: 4px solid #238636; /* Zielona linia z boku (styl inżynierski) */
+    padding-left: 20px;            /* Odstęp od tej zielonej linii */
+    margin-top: 20px;
+}
+
+.critical-value {
+    color: #f85149; /* Czerwony kolor dla wartości krytycznych */
+    font-weight: bold;
+}
+
+/* Stylowanie tabeli (Selektory tagów) */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Łączy ramki komórek w jedną linię */
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #30363d;
+    padding: 12px;
+    text-align: left;
+}
+
+/* Selektor złożony (Nagłówki tabeli) */
+th {
+    background-color: #21262d;
+    color: #58a6ff; /* Niebieski kolor dla nagłówków kolumn */
+}
+
+/* Pseudo-selektor (Co drugi wiersz jaśniejszy) */
+tr:nth-child(even) {
+    background-color: #1c2128;
+}

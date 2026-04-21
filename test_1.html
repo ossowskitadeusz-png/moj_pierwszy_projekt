@@ -5,11 +5,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Karta Charakterystyki Pompy Wtryskowej</title>
+    <link rel="stylesheet" href="TEST_1.CSS">
 </head>
 
 <body>
     <div id="main-document">
-        <h1>Pompa Wtryskowa Model XYZ</h1>
+        <div class="header-flex">
+            <h1>Pompa Wtryskowa Model XYZ</h1>
+            <span class="status-active">STATUS: ACTIVE</span>
+        </div>
         <hr>
 
         <section id="dane-techniczne">
@@ -31,8 +35,7 @@
                 </tbody>
             </table>
             <p>Pompa wtryskowa jest przystosowana do pracy w temperaturze od <span class="highlight">-20°C</span> do
-                <span class="highlight">80°C</span>.
-            </p>
+                <span class="highlight">80°C</span>.</p>
         </section>
 
         <section id="instrukcja-konserwacji">
@@ -49,7 +52,7 @@
         <section id="log-napraw">
             <h2>Log Napraw</h2>
             <p>Rejestr wykonywanych napraw oraz przeglądów serwisowych.</p>
-            <table border="1" cellspacing="0" cellpadding="5">
+            <table>
                 <thead>
                     <tr>
                         <th>Data</th>

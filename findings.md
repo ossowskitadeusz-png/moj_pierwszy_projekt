@@ -12,3 +12,4 @@
 - **Weryfikacja**: Obowiązkowy "Test Systemowy" po każdej fazie.
 - **Ocenianie**: Skala 1-10 za każdy moduł.
 - **Cel**: Uniwersalne fundamenty pod budowę dowolnych systemów.
+- **Styl Wizualny**: Option B (Dark Engineering) - ciemne motywy, wysoki kontrast.

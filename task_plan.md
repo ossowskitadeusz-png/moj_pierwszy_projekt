@@ -24,10 +24,23 @@
 - Kryteria: 0 błędów walidacji, poprawna hierarchia nagłówków, użycie minimum 10 różnych tagów.
 - Nagroda: Ocena w skali 1-10 i odblokowanie Fazy 2 (CSS).
 
-### Faza 2: Estetyka i Układ (CSS)
-- [ ] Box Model (marginesy, obramowania, wypełnienia).
-- [ ] Flexbox – inżynierskie podejście do układu elementów.
-- [ ] Zmienne CSS i systemy kolorów.
+## [BLUEPRINT] Faza 2: Estetyka i Układ (Visual Engineering)
+
+### Cele techniczne:
+1. Zrozumienie Box Modelu (klucz do układania elementów).
+2. Opanowanie kaskadowości i priorytetów selektorów CSS.
+3. Budowa elastycznych układów za pomocą Flexbox.
+
+### Harmonogram mikro-zadań:
+1. **Lekcja 5**: Box Model – marginesy (margin), obramowania (border) i wypełnienie (padding).
+2. **Lekcja 6**: Selektory i Kaskada – jak CSS wybiera, który styl zastosować.
+3. **Lekcja 7**: Flexbox – zarządzanie przestrzenią i osiami (inżynierski layout).
+4. **Lekcja 8**: Typografia i Kolory – czcionki Google Fonts i systemy HEX/RGB.
+
+### [MILESTONE] Test Systemowy 2:
+- Zadanie: Pełne ostylowanie pliku `test_1.html`.
+- Kryteria: Responsywny układ (Flexbox), użycie zmiennych CSS, czytelność na poziomie dokumentacji technicznej.
+- Nagroda: Ocena 1-10 i odblokowanie Fazy 3 (Git Proficiency).
 
 ### Faza 3: Kontrola Wersji (Git Proficiency)
 - [ ] Rozwiązywanie konfliktów.
