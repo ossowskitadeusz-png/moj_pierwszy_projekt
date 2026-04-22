@@ -35,7 +35,8 @@
                 </tbody>
             </table>
             <p>Pompa wtryskowa jest przystosowana do pracy w temperaturze od <span class="highlight">-20°C</span> do
-                <span class="highlight">80°C</span>.</p>
+                <span class="highlight">80°C</span>.
+            </p>
         </section>
 
         <section id="instrukcja-konserwacji">
@@ -50,27 +51,19 @@
         </section>
 
         <section id="log-napraw">
-            <h2>Log Napraw</h2>
-            <p>Rejestr wykonywanych napraw oraz przeglądów serwisowych.</p>
+            <h2>Log Napraw (Live)</h2>
+            <p>Rejestr pobierany w czasie rzeczywistym z bazy danych SQLite.</p>
             <table>
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Data</th>
                         <th>Opis Naprawy</th>
                         <th>Technik</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>2024-01-15</td>
-                        <td>Wymiana uszczelki pompy</td>
-                        <td>Jan Kowalski</td>
-                    </tr>
-                    <tr>
-                        <td>2024-03-10</td>
-                        <td>Czyszczenie filtrów paliwa</td>
-                        <td>Agnieszka Nowak</td>
-                    </tr>
+                <tbody id="logs-body">
+                    <!-- Dane zostaną wstrzyknięte przez JavaScript -->
                 </tbody>
             </table>
         </section>
@@ -81,6 +74,43 @@
         </footer>
 
     </div>
+    <script>
+        async function loadLogs() {
+            console.log("🔄 Pobieram dane z API...");
+            const tableBody = document.getElementById('logs-body');
+
+            try {
+                const response = await fetch('/api/logs');
+                const logs = await response.json();
+
+                console.log("✅ Dane pobrane:", logs);
+
+                // Czyścimy tabelę przed dodaniem nowych danych
+                tableBody.innerHTML = "";
+
+                // Lekcja 21: Iteracja po danych i tworzenie elementów DOM
+                logs.forEach(log => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${log.id}</td>
+                        <td>${log.date}</td>
+                        <td>${log.description}</td>
+                        <td>${log.technician}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error("❌ Błąd pobierania danych:", error);
+                tableBody.innerHTML = "<tr><td colspan='4' style='color: red;'>Błąd ładowania danych</td></tr>";
+            }
+        }
+
+        loadLogs();
+    </script>
+
 </body>
 
 </html>

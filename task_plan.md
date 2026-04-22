@@ -61,6 +61,41 @@
 - Kryteria: Czysta historia commitów, profesjonalne README, poprawny merge z gałęzi feature do main.
 - Nagroda: Certyfikat ukończenia modułu "Fundamenty".
 
+## [BLUEPRINT] Faza 4: Analytical Dashboard (Backend & Data)
+
+### Cele techniczne:
+1. Zarządzanie zależnościami za pomocą **NPM**.
+2. Architektura bazy danych **SQLite** (zgodnie z Konstytucją).
+3. Logika analityczna w **Node.js** (przetwarzanie danych).
+
+### Harmonogram mikro-zadań:
+1. **Lekcja 14**: Fundamenty NPM – `npm init`, `package.json` i skrypty.
+2. **Lekcja 15**: Modelowanie Danych – projektowanie tabel w SQLite.
+3. **Lekcja 16**: System CRUD – zapis i odczyt danych z bazy.
+4. **Lekcja 17**: Logika analityczna – obliczenia i statystyki w JS.
+
+### [MILESTONE] Test Systemowy 4:
+- Zadanie: Skrypt `init_db.js` generujący bazę z danymi testowymi.
+- Kryteria: Poprawność schematu, obsługa błędów, czytelność kodu.
+
+## [BLUEPRINT] Faza 5: Full-Stack Integration (The Server)
+
+### Cele techniczne:
+1. Stworzenie serwera za pomocą **Express.js**.
+2. Komunikacja między przeglądarką a serwerem (**API**).
+3. Dynamiczne odświeżanie strony bez przeładowania (**Fetch API**).
+
+### Harmonogram mikro-zadań:
+1. **Lekcja 18**: Express Setup – instalacja i uruchomienie serwera HTTP. [ZAKOŃCZONE]
+2. **Lekcja 19**: JSON API – endpoint przesyłający dane z bazy. [ZAKOŃCZONE]
+3. **Lekcja 20**: Frontend Fetch – pobieranie danych w JavaScript przeglądarkowym. [ZAKOŃCZONE]
+4. **Lekcja 21**: DOM Update – dynamiczne generowanie tabeli na stronie. [ZAKOŃCZONE]
+
+### [MILESTONE] Test Systemowy 5:
+- Zadanie: Dashboard w przeglądarce automatycznie wyświetla dane pobrane z SQLite.
+- Kryteria: Brak błędów w konsoli przeglądarki, responsywność, poprawne mapowanie danych.
+
 ## Checklisty Techniczne
 - [ ] Każdy plik HTML musi być zgodny ze standardem W3C.
 - [ ] Każdy commit w Git musi mieć jasny, techniczny opis.
+- [ ] Dane wrażliwe (jeśli będą) muszą być w `.env`.

@@ -1,0 +1,26 @@
+{
+  "name": "moj_pierwszy_projekt",
+  "version": "1.0.0",
+  "description": "Profesjonalne repozytorium dokumentujące proces nauki inżynierii webowej.",
+  "main": "hello.js",
+  "scripts": {
+    "start": "node hello.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt/issues"
+  },
+  "homepage": "https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  }
+}

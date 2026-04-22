@@ -9,6 +9,7 @@
 - **Testy**: Sprawdzenie spójności struktury plików w workspace.
 
 ## Log: 2026-04-22
-- **Zadanie**: Faza 3 (Git Proficiency) - Lekcja 12 (Zaawansowany Markdown).
-- **Status**: Teoria i analiza składni technicznej.
-- **Cel**: Upgrade README.md do standardu profesjonalnej dokumentacji.
+- **Zadanie**: Faza 5 (Full-Stack Integration) ZAKOŃCZONA.
+- **Status**: Milestone 5 osiągnięty (10/10).
+- **Wynik**: System wyświetla dane z bazy SQLite w czasie rzeczywistym.
+- **Cel**: Podsumowanie modułu "Fundamenty" i przygotowanie do nowych wyzwań.
