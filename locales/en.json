@@ -1,0 +1,17 @@
+{
+  "sidebar_engine_ops": "Engine Operations",
+  "sidebar_file_explorer": "File Explorer",
+  "sidebar_maintenance_log": "Maintenance Log",
+  "sidebar_spare_parts": "Spare Parts",
+  "sidebar_management": "Management",
+  "sidebar_tasks": "Tasks & Projects",
+  "sidebar_checklists": "Checklists",
+  "sidebar_messages": "Messages",
+  "sidebar_settings": "Settings",
+  "header_system_online": "SYSTEM ONLINE",
+  "main_new_folder": "New Folder",
+  "main_upload": "Upload Files",
+  "right_quick_actions": "Quick Actions",
+  "right_download": "Download File",
+  "right_delete": "Delete"
+}

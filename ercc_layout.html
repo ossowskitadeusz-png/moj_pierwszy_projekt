@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCC - Engine Room Command Center</title>
+    <link rel="stylesheet" href="ercc_style.css">
+    <!-- Font Awesome do ikon (wymaga dostępu do internetu, ale można pobrać lokalnie później) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="ercc-app-container">
+        
+        <!-- 1. LEFT SIDEBAR -->
+        <aside class="panel sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-ship"></i> <span>ERCC</span> System
+            </div>
+            
+            <input type="text" class="search-bar" placeholder="Search files, tasks...">
+
+            <div class="nav-group">
+                <div class="nav-title" data-i18n="sidebar_engine_ops">Engine Operations</div>
+                <div class="nav-item active"><i class="fa-solid fa-folder-tree" style="width:25px;"></i> <span data-i18n="sidebar_file_explorer">File Explorer</span></div>
+                <div class="nav-item"><i class="fa-solid fa-wrench" style="width:25px;"></i> <span data-i18n="sidebar_maintenance_log">Maintenance Log</span></div>
+                <div class="nav-item"><i class="fa-solid fa-gears" style="width:25px;"></i> <span data-i18n="sidebar_spare_parts">Spare Parts</span></div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title" data-i18n="sidebar_management">Management</div>
+                <div class="nav-item"><i class="fa-solid fa-list-check" style="width:25px;"></i> <span data-i18n="sidebar_tasks">Tasks & Projects</span></div>
+                <div class="nav-item"><i class="fa-solid fa-clipboard-check" style="width:25px;"></i> <span data-i18n="sidebar_checklists">Checklists</span></div>
+                <div class="nav-item"><i class="fa-solid fa-comments" style="width:25px;"></i> <span data-i18n="sidebar_messages">Messages</span> <span style="background:var(--accent-danger); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left:auto;">3</span></div>
+            </div>
+
+            <div class="nav-group" style="margin-top: auto;">
+                <div class="nav-item"><i class="fa-solid fa-gear" style="width:25px;"></i> <span data-i18n="sidebar_settings">Settings</span></div>
+                <div class="user-tag" style="background: transparent; border: 1px solid var(--border-color); margin-top: 10px;">
+                    <div class="avatar">CE</div>
+                    <div>
+                        <div style="font-size: 0.9rem;">Chief Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Admin</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. TOP HEADER -->
+        <header class="panel top-header">
+            <div class="header-breadcrumbs" id="current-path-display">
+                <i class="fa-solid fa-folder" style="color:var(--text-muted);"></i> <span id="path-text">Engine_Room_Docs</span>
+            </div>
+            <div class="header-status">
+                <span style="color: var(--text-main); cursor: pointer; font-weight: bold; background: var(--bg-dark); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-color);" onclick="toggleLanguage()" id="lang-btn"><i class="fa-solid fa-globe"></i> EN</span>
+                <span class="badge-ok"><i class="fa-solid fa-check-circle"></i> <span data-i18n="header_system_online">SYSTEM ONLINE</span></span>
+                <button class="btn-primary" style="background: transparent; border: 1px solid var(--border-color);"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <main class="panel main-content">
+            <div class="content-tabs">
+                <div class="tab active">Files</div>
+                <div class="tab">Tasks (2)</div>
+                <div class="tab">Notes</div>
+                <div class="tab">Audit Log</div>
+            </div>
+
+            <div class="action-bar">
+                <div>
+                    <button class="btn-primary" style="background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main);"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+                </div>
+                <div>
+                    <button class="btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Files</button>
+                </div>
+            </div>
+
+            <!-- Folders Grid -->
+            <div class="folders-grid" id="folders-container">
+                <!-- Foldery będą tu generowane dynamicznie przez JS -->
+                <div style="color: var(--text-muted);">Ładowanie folderów...</div>
+            </div>
+
+            <!-- Files List -->
+            <table class="files-list">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Size</th>
+                        <th>Modified Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="files-container">
+                    <!-- Pliki będą tu generowane dynamicznie przez JS -->
+                </tbody>
+            </table>
+        </main>
+
+        <!-- 4. RIGHT SIDEBAR (DETAILS) -->
+        <aside class="panel right-panel">
+            <div class="detail-section">
+                <div class="detail-title">Selection Info <i class="fa-solid fa-circle-info"></i></div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <i class="fa-solid fa-file-pdf" style="font-size: 4rem; color: #ef4444;"></i>
+                    <h3 style="margin-top: 10px; font-size: 1.1rem;">Purifier_Manual_v2.pdf</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">4.2 MB</p>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-title">Uploaded By <i class="fa-solid fa-pen"></i></div>
+                <div class="user-tag">
+                    <div class="avatar" style="background-color: #f59e0b;">2E</div>
+                    <div>
+                        <div style="font-weight: bold;">2nd Eng. Kowalski</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Engine Dept.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-title">Tags <i class="fa-solid fa-plus"></i></div>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                    <span style="background: rgba(59,130,246,0.2); color: #3b82f6; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">#manual</span>
+                    <span style="background: rgba(245,158,11,0.2); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">#purifier</span>
+                    <span style="background: rgba(239,68,68,0.2); color: #ef4444; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">#critical</span>
+                </div>
+            </div>
+
+            <div class="detail-section" style="border: none;">
+                <div class="detail-title">Quick Actions</div>
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px;"><i class="fa-solid fa-download"></i> Download File</button>
+                <button class="btn-primary" style="width: 100%; background: var(--bg-app); border: 1px solid var(--accent-danger); color: var(--accent-danger);"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- SKRYPT LOGIKI WIELOJĘZYCZNOŚCI (i18n) -->
+    <script>
+        let currentLang = 'en'; // Domyślny język
+
+        async function loadLanguage(lang) {
+            try {
+                const response = await fetch(`/locales/${lang}.json`);
+                if (!response.ok) throw new Error('Brak pliku tłumaczeń');
+                
+                const translations = await response.json();
+                
+                // Znajdź wszystkie elementy z atrybutem data-i18n
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    if (translations[key]) {
+                        element.textContent = translations[key];
+                    }
+                });
+                
+                // Aktualizacja przycisku
+                document.getElementById('lang-btn').innerHTML = `<i class="fa-solid fa-globe"></i> ${lang.toUpperCase()}`;
+            } catch (error) {
+                console.error('Błąd ładowania i18n:', error);
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'pl' : 'en';
+            loadLanguage(currentLang);
+        }
+    </script>
+
+    <!-- SKRYPT LOGIKI FILE EXPLORERA -->
+    <script>
+        let currentPath = '';
+
+        async function loadFiles(folderPath = '') {
+            try {
+                // Wywołanie naszego nowego API w Node.js z symulacją zalogowanego użytkownika (np. 1st Eng)
+                const response = await fetch(`/api/files?folder=${encodeURIComponent(folderPath)}`, {
+                    headers: {
+                        'x-user': '1st Engineer' // W prawdziwym systemie to pochodzi z sesji
+                    }
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                currentPath = data.currentFolder;
+                
+                // Aktualizacja paska nawigacji (Breadcrumbs)
+                const displayPath = currentPath === '' ? 'Engine_Room_Docs' : 'Engine_Room_Docs / ' + currentPath.replace(/\\/g, ' / ');
+                document.getElementById('path-text').innerHTML = displayPath;
+                
+                const foldersContainer = document.getElementById('folders-container');
+                const filesContainer = document.getElementById('files-container');
+                
+                foldersContainer.innerHTML = '';
+                filesContainer.innerHTML = '';
+
+                // Przycisk "Wróć Wyżej", jeśli nie jesteśmy w głównym katalogu
+                if (currentPath !== '') {
+                    foldersContainer.innerHTML += `
+                        <div class="folder-card" onclick="goUp()">
+                            <div class="folder-icon" style="color: var(--text-muted);"><i class="fa-solid fa-level-up-alt"></i></div>
+                            <div style="font-weight: bold;">.. (Go Back)</div>
+                        </div>
+                    `;
+                }
+
+                // Renderowanie wyników
+                data.contents.forEach(item => {
+                    if (item.isDir) {
+                        // Renderowanie folderów
+                        const nextPath = currentPath === '' ? item.name : currentPath + '/' + item.name;
+                        foldersContainer.innerHTML += `
+                            <div class="folder-card" onclick="loadFiles('${nextPath}')">
+                                <div class="folder-icon" style="color: #3b82f6;"><i class="fa-solid fa-folder"></i></div>
+                                <div style="font-weight: bold;">${item.name}</div>
+                            </div>
+                        `;
+                    } else {
+                        // Renderowanie plików
+                        const sizeKB = (item.size / 1024).toFixed(2);
+                        const dateObj = new Date(item.modified);
+                        const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
+                        
+                        // Przypisanie ikony i koloru bazując na rozszerzeniu
+                        let icon = '<i class="fa-solid fa-file" style="color:var(--text-muted);"></i>';
+                        if (item.name.endsWith('.pdf')) icon = '<i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>';
+                        if (item.name.endsWith('.xlsx') || item.name.endsWith('.xls')) icon = '<i class="fa-solid fa-file-excel" style="color:#10b981;"></i>';
+                        if (item.name.endsWith('.docx') || item.name.endsWith('.doc')) icon = '<i class="fa-solid fa-file-word" style="color:#3b82f6;"></i>';
+
+                        filesContainer.innerHTML += `
+                            <tr>
+                                <td style="font-weight: 500;">${icon} <span style="margin-left: 8px;">${item.name}</span></td>
+                                <td style="color: var(--text-muted);">${sizeKB} KB</td>
+                                <td style="color: var(--text-muted);">${dateStr}</td>
+                                <td><button class="btn-primary" style="padding: 4px 8px; font-size: 0.8rem; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">View Details</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                if (filesContainer.innerHTML === '') {
+                    filesContainer.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No files in this directory.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('Błąd pobierania plików:', error);
+                document.getElementById('folders-container').innerHTML = '<div style="color: red;">Błąd połączenia z serwerem.</div>';
+            }
+        }
+
+        // Funkcja powrotu do folderu nadrzędnego
+        function goUp() {
+            if (currentPath === '') return;
+            const parts = currentPath.split('/');
+            parts.pop(); // usuwamy ostatni folder
+            loadFiles(parts.join('/'));
+        }
+
+        // Uruchomienie funkcji od razu po załadowaniu strony
+        window.onload = () => {
+            loadFiles();
+        };
+    </script>
+</body>
+</html>

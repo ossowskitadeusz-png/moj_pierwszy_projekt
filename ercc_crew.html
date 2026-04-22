@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCC - Crew Dashboard</title>
+    <link rel="stylesheet" href="ercc_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .task-list-large {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .task-card-large {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--accent-primary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .task-card-large:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-primary);
+        }
+        .task-card-large.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent-primary);
+        }
+        .task-info h3 {
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        .task-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .task-badges span {
+            background: var(--bg-app);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .task-status-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-start {
+            background: var(--accent-primary);
+            color: white;
+        }
+        .btn-done {
+            background: var(--accent-success);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ercc-app-container" style="grid-template-columns: 220px 1fr 350px;">
+        
+        <!-- 1. LEFT SIDEBAR (MINIMALIST) -->
+        <aside class="panel sidebar" style="border-right: 2px solid var(--border-color);">
+            <div class="sidebar-logo" style="margin-bottom: 40px;">
+                <i class="fa-solid fa-ship"></i> <span>ERCC</span>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-title">My Work</div>
+                <div class="nav-item active" style="font-size: 1.1rem; padding: 15px 10px;"><i class="fa-solid fa-list-check" style="width:30px;"></i> My Tasks <span style="background:var(--accent-primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px; margin-left:auto;">2</span></div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Resources</div>
+                <div class="nav-item" style="font-size: 1.1rem; padding: 15px 10px;"><i class="fa-solid fa-book-open" style="width:30px;"></i> Manuals</div>
+                <div class="nav-item" style="font-size: 1.1rem; padding: 15px 10px;"><i class="fa-solid fa-triangle-exclamation" style="width:30px;"></i> Safety Procs.</div>
+            </div>
+
+            <div class="nav-group" style="margin-top: auto;">
+                <div class="user-tag" style="background: transparent; border: 1px solid var(--border-color); margin-top: 10px;">
+                    <div class="avatar" style="background-color: var(--accent-success);">3E</div>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: bold; color: var(--text-main);">3rd Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Operational</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. TOP HEADER -->
+        <header class="panel top-header">
+            <div class="header-breadcrumbs" style="font-size: 1.4rem;">
+                <i class="fa-solid fa-clipboard-user" style="color:var(--accent-primary);"></i> My Tasks For Today
+            </div>
+            <div class="header-status">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-globe"></i> EN</span>
+                <span class="badge-ok"><i class="fa-solid fa-signal"></i> CONNECTED</span>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <main class="panel main-content">
+            <div class="task-list-large">
+                
+                <!-- Active Task -->
+                <div class="task-card-large active">
+                    <div class="task-info">
+                        <h3>Replace Fuel Filters on GenSet 1</h3>
+                        <p>Standard 500h maintenance routine. Ensure valves are closed before opening housing.</p>
+                        <div class="task-badges">
+                            <span style="color: var(--accent-warning);"><i class="fa-solid fa-clock"></i> Due: 14:00 Today</span>
+                            <span style="color: var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Engine Room Deck 2</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="task-status-btn btn-done"><i class="fa-solid fa-check"></i> MARK AS DONE</button>
+                    </div>
+                </div>
+
+                <!-- Next Task -->
+                <div class="task-card-large" style="border-left-color: var(--border-color); opacity: 0.8;">
+                    <div class="task-info">
+                        <h3 style="color: var(--text-muted);">Assist Fitter with Pipe Welding</h3>
+                        <p>Provide fire watch and assist with positioning the pipe bracket near cooling pump.</p>
+                        <div class="task-badges">
+                            <span style="color: var(--text-muted);"><i class="fa-solid fa-clock"></i> Due: Tomorrow</span>
+                            <span style="color: var(--text-muted);"><i class="fa-solid fa-users"></i> with Oiler No.1</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="task-status-btn" style="background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main);"><i class="fa-solid fa-play"></i> START TASK</button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- 4. RIGHT SIDEBAR (TASK CONTEXT & HELP) -->
+        <aside class="panel right-panel" style="background: var(--bg-app);">
+            <div class="detail-section" style="border-color: var(--accent-primary);">
+                <div class="detail-title" style="color: var(--text-main); font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+                    Current Task Details
+                </div>
+                
+                <h4 style="margin-bottom: 10px; color: var(--accent-primary);">Replace Fuel Filters</h4>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+                    Assigned by: 1st Engineer<br>
+                    Equipment: GenSet No.1<br>
+                    Required Spares: Filter Element (Part #45-A)
+                </p>
+
+                <!-- Embedded Manual Link -->
+                <div style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                    <i class="fa-solid fa-file-pdf" style="font-size: 2rem; color: #ef4444;"></i>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">GenSet_Maintenance_Manual.pdf</div>
+                        <div style="font-size: 0.8rem; color: var(--accent-primary);">Click to Open Manual</div>
+                    </div>
+                </div>
+
+                <!-- Problem Report Button -->
+                <button style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: transparent; border: 1px solid var(--accent-warning); color: var(--accent-warning); font-weight: bold; cursor: pointer; margin-bottom: 10px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Report Problem / Need Spares
+                </button>
+                
+                <button style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-weight: bold; cursor: pointer;">
+                    <i class="fa-solid fa-message"></i> Message 1st Eng
+                </button>
+
+            </div>
+        </aside>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCC - 1st Engineer (Planner) Dashboard</title>
+    <link rel="stylesheet" href="ercc_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Kanban specific styles */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .kanban-column {
+            background: var(--bg-app);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            width: 300px;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        .kanban-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .kanban-body {
+            padding: 10px;
+            flex-grow: 1;
+            min-height: 200px;
+        }
+        .task-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: grab;
+            border-left: 4px solid var(--accent-primary);
+        }
+        .task-card:hover {
+            border-color: var(--text-muted);
+        }
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .task-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+        .assignee-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 10px;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ercc-app-container">
+        
+        <!-- 1. LEFT SIDEBAR -->
+        <aside class="panel sidebar" style="border-right: 2px solid var(--accent-primary);">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-ship"></i> <span>ERCC</span> System
+            </div>
+            
+            <input type="text" class="search-bar" placeholder="Search manuals, reports, tasks...">
+
+            <div class="nav-group">
+                <div class="nav-title">Management & Planning</div>
+                <div class="nav-item active"><i class="fa-solid fa-calendar-days" style="width:25px;"></i> Task Planner</div>
+                <div class="nav-item"><i class="fa-solid fa-list-check" style="width:25px;"></i> Active Tasks</div>
+                <div class="nav-item"><i class="fa-solid fa-clipboard-check" style="width:25px;"></i> Checklists</div>
+                <div class="nav-item"><i class="fa-solid fa-inbox" style="width:25px;"></i> Chief's Reports <span style="background:var(--accent-warning); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left:auto;">2</span></div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Engine Operations</div>
+                <div class="nav-item"><i class="fa-solid fa-folder-tree" style="width:25px;"></i> File Explorer</div>
+                <div class="nav-item"><i class="fa-solid fa-wrench" style="width:25px;"></i> Maintenance Log</div>
+                <div class="nav-item"><i class="fa-solid fa-gears" style="width:25px;"></i> Spare Parts</div>
+            </div>
+
+            <div class="nav-group" style="margin-top: auto;">
+                <div class="user-tag" style="background: transparent; border: 1px solid var(--accent-primary); margin-top: 10px;">
+                    <div class="avatar" style="background-color: var(--accent-primary);">1E</div>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: bold; color: var(--text-main);">1st Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-primary);">Planner / Deputy Chief</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. TOP HEADER -->
+        <header class="panel top-header">
+            <div class="header-breadcrumbs">
+                <i class="fa-solid fa-calendar-days" style="color:var(--text-muted);"></i> Management / Task Planner
+            </div>
+            <div class="header-status">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-globe"></i> EN</span>
+                <span class="badge-ok"><i class="fa-solid fa-check-circle"></i> SYSTEM ONLINE</span>
+                <button class="btn-primary" style="background: var(--accent-primary);"><i class="fa-solid fa-plus"></i> Create Task</button>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <main class="panel main-content">
+            <div class="action-bar" style="margin-bottom: 20px;">
+                <h2 style="color: var(--text-main);">Task Assignment Board</h2>
+                <div>
+                    <button class="btn-primary" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);"><i class="fa-solid fa-filter"></i> Filter</button>
+                    <button class="btn-primary" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);"><i class="fa-solid fa-calendar"></i> View Calendar</button>
+                </div>
+            </div>
+
+            <!-- Kanban Board -->
+            <div class="kanban-board">
+                <!-- Column 1: Triage -->
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <span style="color: var(--accent-warning);"><i class="fa-solid fa-inbox"></i> Triage (From Chief)</span>
+                        <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">2</span>
+                    </div>
+                    <div class="kanban-body">
+                        <div class="task-card" style="border-left-color: var(--accent-warning);">
+                            <div class="task-title">Cyl. 5 Oil Leak</div>
+                            <div class="task-desc">"Small oil leak on Main Engine Cylinder 5. Needs checking." - Chief</div>
+                            <div class="task-meta">
+                                <span style="color: var(--accent-warning);"><i class="fa-solid fa-clock"></i> Assign to...</span>
+                            </div>
+                            <button style="width: 100%; margin-top: 10px; padding: 5px; background: var(--accent-primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Convert to Task</button>
+                        </div>
+                        <div class="task-card" style="border-left-color: var(--accent-warning);">
+                            <div class="task-title">Purifier Vibration</div>
+                            <div class="task-desc">"Vibration levels slightly elevated during morning rounds." - Chief</div>
+                            <div class="task-meta">
+                                <span style="color: var(--accent-warning);"><i class="fa-solid fa-clock"></i> Assign to...</span>
+                            </div>
+                            <button style="width: 100%; margin-top: 10px; padding: 5px; background: var(--accent-primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Convert to Task</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: To Do (Assigned) -->
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <span style="color: var(--text-main);"><i class="fa-solid fa-list-ul"></i> Assigned To Do</span>
+                        <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">3</span>
+                    </div>
+                    <div class="kanban-body">
+                        <div class="task-card">
+                            <div class="task-title">Replace Fuel Filters</div>
+                            <div class="task-desc">Standard 500h maintenance on GenSet 1.</div>
+                            <div class="task-meta">
+                                <span style="color: var(--text-muted);"><i class="fa-solid fa-calendar-day"></i> Due: Today</span>
+                                <span class="assignee-badge"><i class="fa-solid fa-user"></i> 3rd Eng</span>
+                            </div>
+                        </div>
+                        <div class="task-card">
+                            <div class="task-title">Weld Broken Pipe Bracket</div>
+                            <div class="task-desc">Bracket near the cooling pump broke loose.</div>
+                            <div class="task-meta">
+                                <span style="color: var(--text-muted);"><i class="fa-solid fa-calendar-day"></i> Due: Tomorrow</span>
+                                <span class="assignee-badge"><i class="fa-solid fa-user-helmet-safety"></i> Oiler No.1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: In Progress -->
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <span style="color: var(--accent-primary);"><i class="fa-solid fa-spinner"></i> In Progress</span>
+                        <span style="background: rgba(59,130,246,0.2); color: var(--accent-primary); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">1</span>
+                    </div>
+                    <div class="kanban-body">
+                        <div class="task-card" style="border-left-color: var(--accent-primary);">
+                            <div class="task-title">Check Injectors</div>
+                            <div class="task-desc">Investigate low pressure on injector 4.</div>
+                            <div class="task-meta">
+                                <span style="color: var(--accent-primary);"><i class="fa-solid fa-person-digging"></i> Working now</span>
+                                <span class="assignee-badge"><i class="fa-solid fa-user"></i> 2nd Eng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 4: Needs Verification (Done by crew) -->
+                <div class="kanban-column">
+                    <div class="kanban-header">
+                        <span style="color: var(--accent-success);"><i class="fa-solid fa-check-double"></i> Awaiting Verification</span>
+                        <span style="background: rgba(16,185,129,0.2); color: var(--accent-success); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">1</span>
+                    </div>
+                    <div class="kanban-body">
+                        <div class="task-card" style="border-left-color: var(--accent-success); opacity: 0.8;">
+                            <div class="task-title"><strike>Clean Bilge Wells</strike></div>
+                            <div class="task-desc">Reported as done by Wiper. Please verify.</div>
+                            <div class="task-meta">
+                                <span style="color: var(--accent-success);"><i class="fa-solid fa-check"></i> Done (Pending)</span>
+                                <span class="assignee-badge"><i class="fa-solid fa-user"></i> Wiper</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 4. RIGHT SIDEBAR (TEAM STATUS) -->
+        <aside class="panel right-panel">
+            <div class="detail-section">
+                <div class="detail-title">Engine Team Status <i class="fa-solid fa-users"></i></div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Live view of current assignments.</p>
+                
+                <div class="user-tag" style="border: 1px solid var(--border-color);">
+                    <div class="avatar" style="background-color: var(--accent-primary);">2E</div>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; font-size: 0.85rem;">2nd Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-primary);"><i class="fa-solid fa-circle"></i> Busy (Check Injectors)</div>
+                    </div>
+                </div>
+
+                <div class="user-tag" style="border: 1px solid var(--border-color);">
+                    <div class="avatar" style="background-color: var(--accent-success);">3E</div>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; font-size: 0.85rem;">3rd Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-success);"><i class="fa-solid fa-circle"></i> Available</div>
+                    </div>
+                </div>
+
+                <div class="user-tag" style="border: 1px solid var(--border-color);">
+                    <div class="avatar" style="background-color: var(--accent-warning);">O1</div>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; font-size: 0.85rem;">Oiler No.1 (Fitter)</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-warning);"><i class="fa-solid fa-circle"></i> Scheduled (Tomorrow)</div>
+                    </div>
+                </div>
+                
+                <div class="user-tag" style="border: 1px solid var(--border-color);">
+                    <div class="avatar" style="background-color: var(--accent-success);">EE</div>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; font-size: 0.85rem;">Electrical Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-success);"><i class="fa-solid fa-circle"></i> Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section" style="border: none;">
+                <div class="detail-title">Quick Actions</div>
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px;"><i class="fa-solid fa-bullhorn"></i> Broadcast Message to Crew</button>
+            </div>
+        </aside>
+
+    </div>
+
+</body>
+</html>

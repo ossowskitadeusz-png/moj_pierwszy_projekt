@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCC - Maintenance Log</title>
+    <link rel="stylesheet" href="ercc_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="ercc-app-container">
+        
+        <!-- 1. LEFT SIDEBAR -->
+        <aside class="panel sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-ship"></i> <span>ERCC</span> System
+            </div>
+            
+            <input type="text" class="search-bar" placeholder="Search maintenance history...">
+
+            <div class="nav-group">
+                <div class="nav-title">Engine Operations</div>
+                <div class="nav-item"><i class="fa-solid fa-folder-tree" style="width:25px;"></i> File Explorer</div>
+                <div class="nav-item active"><i class="fa-solid fa-wrench" style="width:25px;"></i> Maintenance Log</div>
+                <div class="nav-item"><i class="fa-solid fa-gears" style="width:25px;"></i> Spare Parts</div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Management</div>
+                <div class="nav-item"><i class="fa-solid fa-list-check" style="width:25px;"></i> Tasks & Projects</div>
+                <div class="nav-item"><i class="fa-solid fa-clipboard-check" style="width:25px;"></i> Checklists</div>
+                <div class="nav-item"><i class="fa-solid fa-comments" style="width:25px;"></i> Messages <span style="background:var(--accent-danger); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left:auto;">3</span></div>
+            </div>
+
+            <div class="nav-group" style="margin-top: auto;">
+                <div class="user-tag" style="background: transparent; border: 1px solid var(--border-color); margin-top: 10px;">
+                    <div class="avatar" style="background-color: var(--text-muted);">2E</div>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: bold; color: var(--text-main);">2nd Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Operational Level</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. TOP HEADER -->
+        <header class="panel top-header">
+            <div class="header-breadcrumbs">
+                <i class="fa-solid fa-wrench" style="color:var(--text-muted);"></i> Engine Operations / Maintenance Log
+            </div>
+            <div class="header-status">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-globe"></i> EN</span>
+                <span class="badge-ok"><i class="fa-solid fa-database"></i> DB CONNECTED</span>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <main class="panel main-content">
+            <div class="action-bar" style="margin-bottom: 20px;">
+                <h2 style="color: var(--text-main);">Historical Maintenance Records</h2>
+                <button onclick="loadMaintenanceLogs()" class="btn-primary" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-main);"><i class="fa-solid fa-arrows-rotate"></i> Sync Data</button>
+            </div>
+
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--accent-primary); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+                <p style="color: var(--text-main); font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-info" style="color: var(--accent-primary);"></i> 
+                    These records are pulled directly from the local SQLite <code>dashboard.db</code> database, replacing the old <code>test_1.html</code> interface.
+                </p>
+            </div>
+
+            <table class="files-list">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date of Repair</th>
+                        <th>Description of Work</th>
+                        <th>Technician / Rank</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="maintenance-container">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Fetching records from SQLite...</td></tr>
+                </tbody>
+            </table>
+        </main>
+
+        <!-- 4. RIGHT SIDEBAR (DETAILS) -->
+        <aside class="panel right-panel">
+            <div class="detail-section" style="border: none;">
+                <div class="detail-title">Quick Actions</div>
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px; background: var(--accent-primary); border: none; color: white;"><i class="fa-solid fa-plus"></i> Add New Record</button>
+                <button onclick="window.location.href='/api/export/maintenance'" class="btn-primary" style="width: 100%; margin-bottom: 10px; background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-muted);"><i class="fa-solid fa-print"></i> Export Log Book (.csv)</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- SKRYPT LOGIKI MAINTENANCE LOG -->
+    <script>
+        async function loadMaintenanceLogs() {
+            try {
+                // To jest to samo API co w Lekcji 19-21!
+                const response = await fetch('/api/logs');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const logs = await response.json();
+                const container = document.getElementById('maintenance-container');
+                container.innerHTML = '';
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No maintenance records found.</td></tr>';
+                    return;
+                }
+
+                logs.forEach(log => {
+                    // Dodajemy trochę "kolorów" dla statusu (symulacja)
+                    const statusHtml = `<span style="background: rgba(16, 185, 129, 0.2); color: var(--accent-success); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--accent-success);"><i class="fa-solid fa-check"></i> Completed</span>`;
+
+                    container.innerHTML += `
+                        <tr>
+                            <td style="color: var(--text-muted);">#${log.id}</td>
+                            <td style="font-weight: 500;">${log.date || 'Unknown'}</td>
+                            <td>${log.description}</td>
+                            <td><i class="fa-solid fa-user-astronaut" style="color: var(--text-muted);"></i> ${log.technician}</td>
+                            <td>${statusHtml}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error('Błąd pobierania logów napraw:', error);
+                document.getElementById('maintenance-container').innerHTML = '<tr><td colspan="5" style="color:red; text-align:center;">Database Connection Error.</td></tr>';
+            }
+        }
+
+        window.onload = () => {
+            loadMaintenanceLogs();
+        };
+    </script>
+</body>
+</html>

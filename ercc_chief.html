@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERCC - Chief Engineer (Admin) Dashboard</title>
+    <link rel="stylesheet" href="ercc_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="ercc-app-container">
+        
+        <!-- 1. LEFT SIDEBAR -->
+        <aside class="panel sidebar" style="border-right: 2px solid var(--accent-warning);">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-ship"></i> <span>ERCC</span> System
+            </div>
+            
+            <div style="background: rgba(245,158,11,0.1); color: var(--accent-warning); padding: 5px; text-align: center; border-radius: 4px; margin-bottom: 20px; font-weight: bold; font-size: 0.8rem; border: 1px solid var(--accent-warning);">
+                <i class="fa-solid fa-lock"></i> ADMIN MODE ACTIVE
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Command & Control</div>
+                <div class="nav-item active"><i class="fa-solid fa-chart-line" style="width:25px;"></i> Overview</div>
+                <div class="nav-item"><i class="fa-solid fa-clipboard-list" style="width:25px;"></i> Daily Rounds (Reports)</div>
+                <div class="nav-item"><i class="fa-solid fa-shield-halved" style="width:25px;"></i> Audit Log <span id="audit-badge" style="background:var(--accent-danger); color:white; padding:2px 6px; border-radius:10px; font-size:10px; margin-left:auto; display:none;">New: 0</span></div>
+                <div class="nav-item"><i class="fa-solid fa-users-gear" style="width:25px;"></i> Crew Management</div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Engine Operations</div>
+                <div class="nav-item"><i class="fa-solid fa-folder-tree" style="width:25px;"></i> File Explorer</div>
+                <div class="nav-item"><i class="fa-solid fa-wrench" style="width:25px;"></i> Maintenance Log</div>
+            </div>
+
+            <div class="nav-group" style="margin-top: auto;">
+                <div class="user-tag" style="background: transparent; border: 1px solid var(--accent-warning); margin-top: 10px;">
+                    <div class="avatar" style="background-color: var(--accent-warning);">CE</div>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: bold; color: var(--text-main);">Chief Engineer</div>
+                        <div style="font-size: 0.75rem; color: var(--accent-warning);">Full Access Level 1</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. TOP HEADER -->
+        <header class="panel top-header">
+            <div class="header-breadcrumbs">
+                <i class="fa-solid fa-chart-line" style="color:var(--text-muted);"></i> Command Overview / Dashboard
+            </div>
+            <div class="header-status">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-globe"></i> EN</span>
+                <button class="btn-primary" style="background: var(--accent-primary);"><i class="fa-solid fa-plus"></i> New Daily Report</button>
+            </div>
+        </header>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <main class="panel main-content">
+            <div class="action-bar" style="margin-bottom: 20px;">
+                <h2 style="color: var(--text-main);">System Status Overview</h2>
+            </div>
+
+            <!-- Dashboard Widgets (using grid) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div style="background: var(--bg-app); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-warning);">
+                    <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Pending Round Reports</div>
+                    <div style="font-size: 2rem; font-weight: bold; margin-top: 10px;">2</div>
+                    <div style="color: var(--accent-warning); font-size: 0.8rem; margin-top: 5px;">Awaiting 1st Eng Planning</div>
+                </div>
+                <div style="background: var(--bg-app); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-success);">
+                    <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Active Tasks (Crew)</div>
+                    <div style="font-size: 2rem; font-weight: bold; margin-top: 10px;">14</div>
+                    <div style="color: var(--accent-success); font-size: 0.8rem; margin-top: 5px;">3 completed today</div>
+                </div>
+                <div style="background: var(--bg-app); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-danger);">
+                    <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Critical Alerts</div>
+                    <div style="font-size: 2rem; font-weight: bold; margin-top: 10px;">1</div>
+                    <div style="color: var(--accent-danger); font-size: 0.8rem; margin-top: 5px;">Purifier Overhaul Overdue</div>
+                </div>
+            </div>
+
+            <!-- Audit Log Section -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="color: var(--text-main);"><i class="fa-solid fa-shield-halved" style="color:var(--text-muted);"></i> Recent Activity (Audit Log)</h3>
+                <button onclick="loadAuditLog()" class="btn-primary" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.8rem;"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+            </div>
+            <table class="files-list">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Target File/Task</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody id="audit-container">
+                    <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Ładowanie logów...</td></tr>
+                </tbody>
+            </table>
+        </main>
+
+        <!-- 4. RIGHT SIDEBAR (QUICK REPORTS) -->
+        <aside class="panel right-panel">
+            <div class="detail-section">
+                <div class="detail-title">My Daily Rounds <i class="fa-solid fa-clipboard"></i></div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Reports waiting for 1st Eng processing.</p>
+                
+                <div style="background: var(--bg-app); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md); margin-bottom: 10px;">
+                    <div style="font-weight: bold; font-size: 0.9rem;">Morning Inspection</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0;">"Small oil leak on Main Engine Cylinder 5. Needs checking."</div>
+                    <div style="font-size: 0.75rem; color: var(--accent-warning);"><i class="fa-solid fa-clock"></i> Pending Triage</div>
+                </div>
+
+                <div style="background: var(--bg-app); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-md);">
+                    <div style="font-weight: bold; font-size: 0.9rem;">Purifier Room</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin: 5px 0;">"Vibration levels slightly elevated."</div>
+                    <div style="font-size: 0.75rem; color: var(--accent-warning);"><i class="fa-solid fa-clock"></i> Pending Triage</div>
+                </div>
+            </div>
+
+            <div class="detail-section" style="border: none;">
+                <div class="detail-title">Admin Quick Actions</div>
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px; background: var(--bg-app); border: 1px solid var(--accent-primary); color: var(--accent-primary);"><i class="fa-solid fa-user-plus"></i> Add New Crew Member</button>
+                <button onclick="window.location.href='/api/export/audit'" class="btn-primary" style="width: 100%; background: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main);"><i class="fa-solid fa-file-export"></i> Export System Log (.csv)</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- SKRYPT LOGIKI AUDYTU I ALERTÓW -->
+    <script>
+        let lastCheckTime = new Date().toISOString().replace('T', ' ').substring(0, 19); // np. "2024-04-22 10:45:00"
+
+        // Funkcja ładująca pełny log audytowy do tabeli
+        async function loadAuditLog() {
+            try {
+                const response = await fetch('/api/audit');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const logs = await response.json();
+                const container = document.getElementById('audit-container');
+                container.innerHTML = '';
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Brak wpisów w logu.</td></tr>';
+                    return;
+                }
+
+                logs.forEach(log => {
+                    const dateObj = new Date(log.timestamp);
+                    const timeStr = dateObj.toLocaleTimeString(); // np. "10:45:00"
+                    
+                    // Kolorowanie akcji
+                    let actionHtml = `<span style="color: var(--text-main);">[${log.action}]</span>`;
+                    if (log.action.includes('Opened')) actionHtml = `<span style="color: var(--accent-primary);">[${log.action}]</span>`;
+                    if (log.action.includes('Deleted')) actionHtml = `<span style="color: var(--accent-danger);">[${log.action}]</span>`;
+                    if (log.action.includes('Downloaded')) actionHtml = `<span style="color: var(--accent-success);">[${log.action}]</span>`;
+
+                    container.innerHTML += `
+                        <tr>
+                            <td style="color: var(--text-muted);">${timeStr}</td>
+                            <td><span style="font-weight:bold; color:var(--text-main);">${log.user}</span></td>
+                            <td>${actionHtml}</td>
+                            <td>${log.target_path}</td>
+                            <td style="color: var(--text-muted); font-family: monospace;">${log.ip_address || 'local'}</td>
+                        </tr>
+                    `;
+                });
+
+                // Po załadowaniu logów, resetujemy licznik i czas sprawdzenia
+                lastCheckTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                document.getElementById('audit-badge').style.display = 'none';
+
+            } catch (error) {
+                console.error('Błąd pobierania logów:', error);
+                document.getElementById('audit-container').innerHTML = '<tr><td colspan="5" style="color:red; text-align:center;">Błąd pobierania danych.</td></tr>';
+            }
+        }
+
+        // --- SYSTEM ALERTOWANIA (LONG POLLING) ---
+        async function checkForNewAlerts() {
+            try {
+                const response = await fetch(`/api/audit/check?since=${lastCheckTime}`);
+                if (!response.ok) return;
+                
+                const data = await response.json();
+                const badge = document.getElementById('audit-badge');
+                
+                if (data.newCount > 0) {
+                    badge.innerHTML = `New: ${data.newCount}`;
+                    badge.style.display = 'inline-block';
+                    // Miganie
+                    badge.style.animation = 'pulse 1s infinite alternate';
+                }
+            } catch (error) {
+                // ignorujemy błędy połączenia w tle
+            }
+        }
+
+        // --- CSS DLA MIGANIA (Wstrzyknięty dynamicznie dla dema) ---
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes pulse {
+                0% { opacity: 1; transform: scale(1); }
+                100% { opacity: 0.7; transform: scale(1.1); box-shadow: 0 0 5px var(--accent-danger); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        window.onload = () => {
+            loadAuditLog();
+            // Uruchomienie skanera alertów co 5 sekund
+            setInterval(checkForNewAlerts, 5000);
+        };
+    </script>
+</body>
+</html>

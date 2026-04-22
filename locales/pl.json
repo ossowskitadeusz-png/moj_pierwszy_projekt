@@ -1,0 +1,17 @@
+{
+  "sidebar_engine_ops": "Operacje Maszynowe",
+  "sidebar_file_explorer": "Przeglądarka Plików",
+  "sidebar_maintenance_log": "Dziennik Napraw",
+  "sidebar_spare_parts": "Części Zamienne",
+  "sidebar_management": "Zarządzanie",
+  "sidebar_tasks": "Zadania i Projekty",
+  "sidebar_checklists": "Listy Kontrolne",
+  "sidebar_messages": "Wiadomości",
+  "sidebar_settings": "Ustawienia",
+  "header_system_online": "SYSTEM AKTYWNY",
+  "main_new_folder": "Nowy Folder",
+  "main_upload": "Prześlij Pliki",
+  "right_quick_actions": "Szybkie Akcje",
+  "right_download": "Pobierz Plik",
+  "right_delete": "Usuń"
+}

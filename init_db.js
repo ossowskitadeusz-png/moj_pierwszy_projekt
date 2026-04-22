@@ -4,15 +4,29 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./dashboard.db');
 
 db.serialize(() => {
-    // 2. Tworzenie tabeli logów (jeśli nie istnieje)
+    // Tabela 1: Logi Napraw (Stara)
     db.run(`
         CREATE TABLE IF NOT EXISTS maintenance_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT NOT NULL,
-            description TEXT NOT NULL,
-            technician TEXT NOT NULL
+            date TEXT,
+            description TEXT,
+            technician TEXT
         )
     `);
+
+    // Tabela 2: Audit Logs (Nowa - Security)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            user TEXT,
+            action TEXT,
+            target_path TEXT,
+            ip_address TEXT
+        )
+    `);
+
+    console.log("Tabele w bazie danych (maintenance_logs, audit_logs) gotowe.");
 
     // 3. Dodanie pierwszego, testowego wpisu (z Twojego test_1.html)
     db.run(`
