@@ -20,5 +20,31 @@ Projekt został zrealizowany w ramach intensywnego kursu podstaw web development
 1. Sklonuj repozytorium: `git clone https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt.git`
 2. Otwórz plik `test_1.html` w dowolnej przeglądarce.
 
----
+## ⚙️ Specyfikacja Techniczna
+
+| Parametr | Wartość | Jednostka |
+| :--- | :---: | :---: |
+| **Model** | XYZ-1500 | - |
+| **Ciśnienie max** | 1500 | bar |
+| **Rok produkcji** | 2023 | - |
+| **Temp. pracy** | -20 do 80 | °C |
+
+### 💻 Przykładowy Kod HTML
+Oto jak zdefiniowana jest tabela w kodzie źródłowym projektu:
+```html
+<table border="1">
+    <thead>
+        <tr>
+            <th>Model</th>
+            <th>Ciśnienie max</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>XYZ-1500</td>
+            <td>1500 bar</td>
+        </tr>
+    </tbody>
+</table>
+
 *Projekt prowadzony pod nadzorem Antigravity AI.*
