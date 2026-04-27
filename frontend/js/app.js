@@ -13,9 +13,16 @@ const app = {
     this.setupEventListeners();
     this.startClock();
     
-    // Pokaż tab zatwierdzeń tylko dla chiefa
-    if (this.currentUser.role === 'chief_mechanic') {
+    // Show/hide role specific features
+    if (this.currentUser.role === 'chief_engineer') {
       document.getElementById('approvalNav').style.display = 'flex';
+      document.getElementById('chiefOnlyMenu').style.display = 'block';
+      document.getElementById('chiefStatCrew').style.display = 'flex';
+      document.getElementById('chiefStatAlerts').style.display = 'flex';
+      document.getElementById('chiefDashboardSections').style.display = 'block';
+      
+      document.querySelectorAll('.mechanic-only').forEach(el => el.style.display = 'none');
+      document.getElementById('recentActivityCard').style.display = 'none'; // Replaced by Chief dashboard
     }
 
     this.navigate(ROUTES.DASHBOARD);
@@ -42,7 +49,7 @@ const app = {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('appContainer').style.display = 'grid';
     document.getElementById('userNameDisplay').textContent = this.currentUser.name;
-    document.getElementById('userRoleDisplay').textContent = this.currentUser.role === 'chief_mechanic' ? 'Chief Mechanic' : 'Engineer';
+    document.getElementById('userRoleDisplay').textContent = this.currentUser.role === 'chief_engineer' ? 'Chief Engineer' : 'Engineer';
     document.getElementById('userAvatar').textContent = this.currentUser.name[0].toUpperCase();
   },
 
@@ -61,11 +68,18 @@ const app = {
 
     // Load module data
     switch(page) {
-      case ROUTES.DASHBOARD: dashboard.load(); break;
+      case ROUTES.DASHBOARD: 
+        if (this.currentUser.role === 'chief_engineer') {
+          if (window.chiefDashboard) chiefDashboard.load();
+        } else {
+          dashboard.load(); 
+        }
+        break;
       case ROUTES.TASKS: tasks.load(); break;
       case ROUTES.CHAT: chat.load(); break;
       case ROUTES.FOLDERS: folders.load(); break;
       case ROUTES.APPROVAL: approval.load(); break;
+      case ROUTES.CREW: if (window.crewMgmt) crewMgmt.load(); break;
     }
   },
 

@@ -24,11 +24,11 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Dla Chief Mechanic
+// Dla Chief Engineer
 const chiefMiddleware = (req, res, next) => {
-  if (req.user.role !== 'chief_mechanic') {
+  if (req.user.role !== 'chief_engineer') {
     return res.status(403).json({ 
-      error: 'Only chief mechanic can access this',
+      error: 'Only chief engineer can access this',
       code: 'FORBIDDEN'
     });
   }

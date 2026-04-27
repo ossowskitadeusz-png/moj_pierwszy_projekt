@@ -17,5 +17,10 @@ const ROUTES = {
   TASKS: 'tasks',
   CHAT: 'chat',
   FOLDERS: 'folders',
-  APPROVAL: 'approval'
+  APPROVAL: 'approval',
+  CREW: 'crew',
+  SECTORS: 'sectors',
+  RESOURCES: 'resources',
+  ALERTS: 'alerts',
+  AUDIT: 'audit'
 };

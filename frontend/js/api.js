@@ -61,4 +61,35 @@ class API {
   // ===== FOLDERS =====
   static getFolders() { return this.request('/folders'); }
   static createFolder(name) { return this.request('/folders', 'POST', { name }); }
+
+  // ===== CHIEF CREW METHODS =====
+  static chief = {
+    getCrew: () => API.request('/chief/crew'),
+    
+    // ===== SECTOR METHODS =====
+    getSectors: () => API.request('/chief/sectors'),
+    getSector: (sectorId) => API.request(`/chief/sectors/${sectorId}`),
+    createSector: (sectorData) => API.request('/chief/sectors', 'POST', sectorData),
+    updateSector: (sectorId, sectorData) => API.request(`/chief/sectors/${sectorId}`, 'PUT', sectorData),
+    deleteSector: (sectorId) => API.request(`/chief/sectors/${sectorId}`, 'DELETE'),
+    updateSectorStatus: (sectorId, status) => API.request(`/chief/sectors/${sectorId}/status`, 'PATCH', { status }),
+    getSectorTemplates: () => API.request('/chief/sectors-templates'),
+    
+    assignCrewToSector: (crewId, sectorId) => 
+      API.request(`/chief/crew/${crewId}/assign-sector`, 'PUT', { sector_id: sectorId }),
+    
+    undoCrewAssignment: (crewId) =>
+      API.request(`/chief/crew/${crewId}/undo-assignment`, 'POST'),
+    
+    getCrewHistory: (crewId) =>
+      API.request(`/chief/crew/${crewId}/history`),
+    
+    getDashboardStats: () => API.request('/chief/dashboard'),
+    getAlerts: () => API.request('/chief/alerts'),
+    getResources: () => API.request('/chief/resources'),
+    updateResource: (resourceType, level, notes) =>
+      API.request('/chief/resources/update', 'POST', { resource_type: resourceType, current_level: level, notes }),
+    resolveAlert: (alertId) =>
+      API.request(`/chief/alerts/${alertId}/resolve`, 'PUT')
+  };
 }

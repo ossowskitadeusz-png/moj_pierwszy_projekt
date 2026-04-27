@@ -33,3 +33,14 @@ const ui = {
     alert(message); // Uproszczone na start
   }
 };
+
+const Utils = {
+  formatDate: utils.formatDate,
+  formatTime(dateString) {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleString('pl-PL');
+  },
+  showNotification(message, type) {
+    ui.showNotification(message, type);
+  }
+};

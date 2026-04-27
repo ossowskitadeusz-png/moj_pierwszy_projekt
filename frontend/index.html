@@ -38,8 +38,8 @@
         
         <p style="text-align: center; font-size: 12px; color: #888;">
           Demo Accounts:<br>
-          <strong>j.smith</strong> / <strong>pass123</strong> (Engineer)<br>
-          <strong>chief</strong> / <strong>chief123</strong> (Chief Engineer)
+          <strong>john.smith</strong> / <strong>pass123</strong> (Engineer)<br>
+          <strong>jose.santos</strong> / <strong>pass123</strong> (Chief Engineer)
         </p>
       </div>
     </div>
@@ -57,6 +57,28 @@
         <a href="#" onclick="app.navigate('dashboard')" class="nav-item" id="nav-dashboard">
           <i class="fa-solid fa-chart-line"></i> Dashboard
         </a>
+        
+        <!-- CHIEF ONLY MENU -->
+        <div id="chiefOnlyMenu" style="display: none;">
+          <a href="#" onclick="app.navigate('crew')" class="nav-item" id="nav-crew">
+            <i class="fa-solid fa-users-gear"></i> Crew Manifest
+          </a>
+          <a href="#" onclick="app.navigate('sectors')" class="nav-item" id="nav-sectors">
+            <i class="fa-solid fa-wrench"></i> Sectors
+          </a>
+          <a href="#" onclick="app.navigate('resources')" class="nav-item" id="nav-resources">
+            <i class="fa-solid fa-gas-pump"></i> Resources
+          </a>
+          <a href="#" onclick="app.navigate('alerts')" class="nav-item" id="nav-alerts">
+            <i class="fa-solid fa-triangle-exclamation"></i> Alerts 
+            <span id="alertBadge" style="background: red; color: white; padding: 2px 6px; border-radius: 50%; font-size: 10px; margin-left: 5px;">0</span>
+          </a>
+          <a href="#" onclick="app.navigate('audit')" class="nav-item" id="nav-audit">
+            <i class="fa-solid fa-scroll"></i> Audit Log
+          </a>
+          <hr style="margin: 15px 0; border: none; border-top: 1px solid #3a4060;">
+        </div>
+
         <a href="#" onclick="app.navigate('tasks')" class="nav-item" id="nav-tasks">
           <i class="fa-solid fa-list-check"></i> Work Orders
         </a>
@@ -104,7 +126,7 @@
             <div class="stat-card">
               <div class="stat-icon"><i class="fa-solid fa-tasks"></i></div>
               <div class="stat-content">
-                <h3>My Work Orders</h3>
+                <h3 id="statTasksTitle">My Work Orders</h3>
                 <p class="stat-number" id="statMyTasks">0</p>
               </div>
             </div>
@@ -115,14 +137,32 @@
                 <p class="stat-number" id="statPending">0</p>
               </div>
             </div>
-            <div class="stat-card blue">
+            
+            <!-- CHIEF SPECIFIC WIDGETS -->
+            <div class="stat-card blue" id="chiefStatCrew" style="display: none;">
+              <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-content">
+                <h3>Total Crew</h3>
+                <p class="stat-number" id="statCrew">0</p>
+              </div>
+            </div>
+            <div class="stat-card red" id="chiefStatAlerts" style="display: none;">
+              <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="stat-content">
+                <h3>Active Alerts</h3>
+                <p class="stat-number" id="statAlertsCount">0</p>
+              </div>
+            </div>
+
+            <!-- MECHANIC WIDGETS -->
+            <div class="stat-card blue mechanic-only">
               <div class="stat-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
               <div class="stat-content">
                 <h3>In Progress</h3>
                 <p class="stat-number" id="statInProgress">0</p>
               </div>
             </div>
-            <div class="stat-card green">
+            <div class="stat-card green mechanic-only">
               <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
               <div class="stat-content">
                 <h3>Completed</h3>
@@ -131,7 +171,25 @@
             </div>
           </div>
 
-          <div class="dashboard-section card">
+          <!-- CHIEF DASHBOARD SECTIONS -->
+          <div id="chiefDashboardSections" style="display: none;">
+            <div class="dashboard-grid" style="margin-top: 20px;">
+              <div class="dashboard-section card" style="flex: 1;">
+                <h2>Crew Status</h2>
+                <div id="crewStatusWidget">Loading...</div>
+              </div>
+              <div class="dashboard-section card" style="flex: 2;">
+                <h2>Resources Monitor</h2>
+                <div id="resourcesWidget" class="resources-grid">Loading...</div>
+              </div>
+            </div>
+            <div class="dashboard-section card" style="margin-top: 20px;">
+              <h2>Critical Alerts</h2>
+              <div id="recentAlerts">Loading...</div>
+            </div>
+          </div>
+
+          <div class="dashboard-section card" id="recentActivityCard" style="margin-top: 20px;">
             <h2>Recent Activity</h2>
             <div id="recentActivityList" class="activity-list">
               <p class="placeholder">No recent activity...</p>
@@ -220,6 +278,277 @@
             <!-- Lista do zatwierdzenia -->
           </div>
         </section>
+        <!-- CREW MANAGEMENT PAGE -->
+        <section id="crewPage" class="page" style="display: none;">
+          <div class="crew-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>⚙️ Crew Manifest & Sector Management</h2>
+            <div class="crew-actions">
+              <button onclick="crewMgmt.refreshData()" class="btn-secondary" title="Refresh all data">
+                🔄 Refresh
+              </button>
+              <button onclick="crewMgmt.showInviteModal()" class="btn-primary">
+                ➕ Invite Crew
+              </button>
+            </div>
+          </div>
+
+          <div class="crew-container">
+            <!-- LEFT COLUMN: Crew Pool -->
+            <div class="crew-pool">
+              <h3>📋 Crew Pool</h3>
+              <div class="pool-filters">
+                <input 
+                  type="text" 
+                  id="crewSearchBox" 
+                  placeholder="Search crew members..."
+                  onkeyup="crewMgmt.renderCrewPool()"
+                  class="search-input"
+                >
+                <select id="crewStatusFilter" onchange="crewMgmt.renderCrewPool()" class="filter-select">
+                  <option value="">All Status</option>
+                  <option value="online">🟢 Online</option>
+                  <option value="offline">⚫ Offline</option>
+                  <option value="away">🟡 Away</option>
+                  <option value="on_leave">❌ On Leave</option>
+                </select>
+              </div>
+
+              <div id="crewList" class="crew-cards-container">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Sectors Drop Zones -->
+            <div class="sectors-container">
+              <div class="sectors-header">
+                <h3>🔧 Sector Assignments</h3>
+                <div class="sectors-actions">
+                  <button onclick="crewMgmt.showAddSectorModal()" class="btn-primary btn-small" title="Create new sector">
+                    ➕ Add Sector
+                  </button>
+                  <button onclick="crewMgmt.showSectorTemplates()" class="btn-secondary btn-small" title="Use predefined template">
+                    📋 Templates
+                  </button>
+                </div>
+              </div>
+
+              <div id="sectorsDropZones" class="sectors-grid">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- UNDO PANEL -->
+          <div id="undoPanel" class="undo-panel" style="display: none;">
+            <span>Last action: <strong id="lastActionText">-</strong></span>
+            <button onclick="crewMgmt.undoLastAssignment()" class="btn-secondary btn-small">↶ Undo</button>
+          </div>
+
+          <!-- ===== MODALS ===== -->
+
+          <!-- ADD/EDIT SECTOR MODAL -->
+          <div id="addSectorModal" class="modal" style="display: none;">
+            <div class="modal-content modal-lg">
+              <span onclick="ui.closeModal('addSectorModal')" class="modal-close">&times;</span>
+              <h2 id="sectorModalTitle">Create New Sector</h2>
+              
+              <form id="addSectorForm">
+                <div class="form-group">
+                  <label>Sector Name *</label>
+                  <input type="text" id="sectorName" required placeholder="e.g., Water Maker Room">
+                </div>
+
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea id="sectorDescription" rows="2" placeholder="e.g., Fresh water production and storage"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Equipment *</label>
+                  <textarea id="sectorEquipment" rows="3" required placeholder="List all equipment (comma separated or line breaks)"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Criticality Level *</label>
+                  <select id="sectorCriticality" required class="criticality-select">
+                    <option value="">Select criticality...</option>
+                    <option value="low">🟢 Low - Non-essential systems</option>
+                    <option value="normal">🔵 Normal - Standard operations</option>
+                    <option value="high">🟠 High - Important systems</option>
+                    <option value="critical">🔴 Critical - Core propulsion/power</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Assign Responsible Engineer (Optional)</label>
+                  <select id="sectorResponsible" class="form-control">
+                    <option value="">None assigned</option>
+                    <!-- Populated by JavaScript -->
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">Create Sector</button>
+                  <button type="button" onclick="ui.closeModal('addSectorModal')" class="btn-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- SECTOR TEMPLATES MODAL -->
+          <div id="sectorTemplatesModal" class="modal" style="display: none;">
+            <div class="modal-content modal-lg">
+              <span onclick="ui.closeModal('sectorTemplatesModal')" class="modal-close">&times;</span>
+              <h2>📋 Sector Templates</h2>
+              <p style="color: #888; margin-bottom: 20px;">Select a template to quickly create a predefined sector:</p>
+              
+              <div id="templatesGrid" class="templates-grid">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- EDIT SECTOR MODAL -->
+          <div id="editSectorModal" class="modal" style="display: none;">
+            <div class="modal-content modal-lg">
+              <span onclick="ui.closeModal('editSectorModal')" class="modal-close">&times;</span>
+              <h2>Edit Sector</h2>
+              
+              <form id="editSectorForm">
+                <input type="hidden" id="editSectorId">
+
+                <div class="form-group">
+                  <label>Sector Name</label>
+                  <input type="text" id="editSectorName" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea id="editSectorDescription" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Equipment</label>
+                  <textarea id="editSectorEquipment" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Criticality Level</label>
+                  <select id="editSectorCriticality" class="criticality-select">
+                    <option value="low">🟢 Low</option>
+                    <option value="normal">🔵 Normal</option>
+                    <option value="high">🟠 High</option>
+                    <option value="critical">🔴 Critical</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Status</label>
+                  <select id="editSectorStatus">
+                    <option value="operational">✓ Operational</option>
+                    <option value="maintenance">🔧 Maintenance</option>
+                    <option value="critical">🚨 Critical</option>
+                    <option value="standby">⏸️ Standby</option>
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">Save Changes</button>
+                  <button type="button" onclick="crewMgmt.handleDeleteSector()" class="btn-danger">Delete Sector</button>
+                  <button type="button" onclick="ui.closeModal('editSectorModal')" class="btn-secondary">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- INVITE CREW MODAL -->
+          <div id="inviteCrewModal" class="modal" style="display: none;">
+            <div class="modal-content">
+              <span onclick="ui.closeModal('inviteCrewModal')" class="modal-close">&times;</span>
+              <h2>Invite New Crew Member</h2>
+              
+              <form id="inviteCrewForm">
+                <div class="form-group">
+                  <label>Full Name *</label>
+                  <input type="text" id="inviteName" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Email *</label>
+                  <input type="email" id="inviteEmail" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Crew Number *</label>
+                    <input type="text" id="inviteCrewNumber" placeholder="ME-005" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="invitePhone">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Certifications</label>
+                  <textarea id="inviteCertifications" rows="2" placeholder="STCW, Diesel Engine, etc."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">Invite Crew Member</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- CREW HISTORY MODAL -->
+          <div id="crewHistoryModal" class="modal" style="display: none;">
+            <div class="modal-content modal-lg">
+              <span onclick="ui.closeModal('crewHistoryModal')" class="modal-close">&times;</span>
+              <h2>Assignment History</h2>
+              <div id="historyList" class="history-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTORS PAGE -->
+        <section id="sectorsPage" class="page" style="display: none;">
+          <div class="page-header">
+            <h2>Sectors Management</h2>
+          </div>
+          <div id="sectorsList" class="sectors-grid">
+            <!-- Sectors go here -->
+          </div>
+        </section>
+
+        <!-- RESOURCES PAGE -->
+        <section id="resourcesPage" class="page" style="display: none;">
+          <div class="page-header">
+            <h2>Resources Monitor</h2>
+          </div>
+          <div id="resourcesFullList" class="resources-grid">
+            <!-- Resources go here -->
+          </div>
+        </section>
+
+        <!-- ALERTS PAGE -->
+        <section id="alertsPage" class="page" style="display: none;">
+          <div class="page-header">
+            <h2>System Alerts</h2>
+          </div>
+          <div id="alertsFullList" class="alerts-list">
+            <!-- Alerts go here -->
+          </div>
+        </section>
+
+        <!-- AUDIT PAGE -->
+        <section id="auditPage" class="page" style="display: none;">
+          <div class="page-header">
+            <h2>Audit Log</h2>
+          </div>
+          <div id="auditFullList" class="audit-list">
+            <!-- Audit logs go here -->
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -298,6 +627,8 @@
   
   <!-- MODUŁY -->
   <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/chief-dashboard.js"></script>
+  <script src="js/modules/crew-management.js"></script>
   <script src="js/modules/tasks.js"></script>
   <script src="js/modules/chat.js"></script>
   <script src="js/modules/folders.js"></script>
