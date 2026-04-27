@@ -1,50 +1,53 @@
-# Mój Pierwszy Projekt: Fundamenty HTML/CSS i Git
+# ERCC - Engine Room Command Center 🚢
 
-Profesjonalne repozytorium dokumentujące proces nauki inżynierii webowej.
+Professional Maritime Management System for the Engine Department, built adhering to the **"Constitution-First" methodology** and clean architecture principles.
 
-## 🚀 O Projekcie
-Projekt został zrealizowany w ramach intensywnego kursu podstaw web developmentu. Skupia się na tworzeniu czytelnej i ergonomicznej dokumentacji technicznej.
+## 🚀 System Architecture
 
-### Czego się nauczyłem?
-- **HTML5**: Semantyka, tabele techniczne, hierarchia danych.
-- **CSS3**: Box Model, Flexbox, Visual Engineering (Dark Mode).
-- **Git**: Branching, Merging, rozwiązywanie konfliktów.
+This project has evolved into a robust **Single Page Application (SPA)** with a decoupled backend and database.
 
-## 📂 Struktura plików
-- `index.html` / `index.css`: Główny raport techniczny silnika.
-- `test_1.html` / `TEST_1.CSS`: Karta charakterystyki pompy (Masterpiece).
-- `task_plan.md`: Mapa drogowa nauki.
-- `progress.md`: Dziennik testów i ocen.
+### Technology Stack
+- **Frontend**: Vanilla JavaScript (SPA router), HTML5, custom CSS (Maritime UI).
+- **Backend**: Node.js with Express.
+- **Database**: SQLite3 with strict schema constraints.
+- **Authentication**: JWT tokens and bcrypt password hashing.
 
-## 🛠️ Jak uruchomić?
-1. Sklonuj repozytorium: `git clone https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt.git`
-2. Otwórz plik `test_1.html` w dowolnej przeglądarce.
+## 📂 Project Structure
 
-## ⚙️ Specyfikacja Techniczna
+```
+ERCC-Team-Manager/
+├── backend/
+│   ├── server.js          # Main Express server and router
+│   ├── db.js              # SQLite connection and schema definition
+│   ├── seed.js            # Initial data population (Demo accounts & tasks)
+│   ├── middleware/        # JWT Authorization middleware
+│   └── routes/            # REST API controllers (auth, tasks, messages, folders)
+├── frontend/
+│   ├── index.html         # Main SPA shell (Login + Dashboard layout)
+│   ├── css/style.css      # Professional Dark Maritime Theme
+│   └── js/
+│       ├── app.js         # Navigation and core SPA logic
+│       ├── api.js         # Centralized API requests
+│       ├── auth.js        # Session management
+│       └── modules/       # Decoupled feature modules (tasks, chat, folders)
+└── data/                  # Physical storage for technical manuals
+```
 
-| Parametr | Wartość | Jednostka |
-| :--- | :---: | :---: |
-| **Model** | XYZ-1500 | - |
-| **Ciśnienie max** | 1500 | bar |
-| **Rok produkcji** | 2023 | - |
-| **Temp. pracy** | -20 do 80 | °C |
+## 🔐 Demo Accounts
+- **Chief Engineer**: `chief` / `chief123` (Access to Work Order Approvals)
+- **Mechanic/Engineer**: `j.smith` / `pass123`
 
-### 💻 Przykładowy Kod HTML
-Oto jak zdefiniowana jest tabela w kodzie źródłowym projektu:
-```html
-<table border="1">
-    <thead>
-        <tr>
-            <th>Model</th>
-            <th>Ciśnienie max</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>XYZ-1500</td>
-            <td>1500 bar</td>
-        </tr>
-    </tbody>
-</table>
+## ⚙️ Core Modules
+1. **Dashboard**: Real-time status overview of all pending/completed tasks.
+2. **Work Orders**: Task assignment and status tracking.
+3. **Comms Log**: Real-time instant messaging between crew members.
+4. **Technical Manuals**: System for managing PDF documentation directories.
 
-*Projekt prowadzony pod nadzorem Antigravity AI.*
+## 🛠️ How to run locally
+1. Install dependencies: `npm install`
+2. Seed the database: `npm run seed`
+3. Start the server: `npm start`
+4. Open the browser: `http://localhost:3000`
+
+---
+*Developed under the guidelines of the "Constitution-First" engineering principles.*

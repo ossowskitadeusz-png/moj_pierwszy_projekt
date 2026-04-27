@@ -1,26 +1,22 @@
 {
-  "name": "moj_pierwszy_projekt",
+  "name": "ercc-team-manager",
   "version": "1.0.0",
-  "description": "Profesjonalne repozytorium dokumentujące proces nauki inżynierii webowej.",
-  "main": "hello.js",
+  "description": "Engine Room Command Center - Team Management System",
+  "main": "backend/server.js",
   "scripts": {
-    "start": "node hello.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "seed": "node backend/seed.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt/issues"
-  },
-  "homepage": "https://github.com/ossowskitadeusz-png/moj_pierwszy_projekt#readme",
   "dependencies": {
-    "express": "^5.2.1",
-    "sqlite3": "^6.0.1"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
