@@ -89,32 +89,45 @@ class ChiefDashboard {
 
   async loadResourcesQuick() {
     try {
-      const resources = await API.chief.getResources();
+      // Get inventory instead of simple resources to have category and more info
+      const resources = await API.resources.getInventory();
       
-      const resourcesHtml = resources.map(r => {
-        const percentage = (r.current_level / r.max_capacity * 100).toFixed(0);
-        const statusClass = r.status === 'critical' ? 'critical' : r.status === 'warning' ? 'warning' : 'normal';
-        const color = r.status === 'critical' ? 'red' : r.status === 'warning' ? 'orange' : '#00ffcc';
+      // Filter for important ones (Fuel, Lube Oils) or anything critical/warning
+      const important = resources.filter(r => 
+        r.status === 'critical' || 
+        r.status === 'warning' || 
+        r.category === 'fuel' || 
+        (r.category === 'lube_oil' && r.current_level < r.max_capacity * 0.9)
+      ).slice(0, 4); // Limit to top 4 for dashboard
+      
+      const resourcesHtml = important.map(r => {
+        const percentage = parseFloat(r.percentage);
+        const statusClass = r.status;
+        const color = r.status === 'critical' ? 'var(--accent-danger)' : 
+                      r.status === 'warning' ? 'var(--accent-warning)' : 
+                      'var(--accent-success)';
         
         return `
-          <div class="resource-card ${statusClass}" style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <h4 style="margin: 0 0 5px 0;">${r.resource_type.toUpperCase()}</h4>
-            <div class="gauge-simple" style="background: #2a2f4c; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 5px;">
-              <div class="gauge-bar">
-                <div class="gauge-fill" style="width: ${percentage}%; background: ${color}; height: 100%;"></div>
-              </div>
+          <div class="resource-mini-card status-${statusClass}" style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid ${color};">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 600; font-size: 0.9rem;">${r.name}</span>
+              <span style="font-size: 0.75rem; color: ${color}; font-weight: bold;">${r.status.toUpperCase()}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa;">
+            <div class="progress-container" style="height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; margin-bottom: 5px;">
+              <div class="progress-bar" style="width: ${percentage}%; background: ${color}; height: 100%; transition: width 0.5s ease;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted);">
+               <span>${r.current_level} / ${r.max_capacity} ${r.unit}</span>
                <span>${percentage}%</span>
-               <span>Last updated: ${Utils.formatTime(r.updated_at)}</span>
             </div>
           </div>
         `;
       }).join('');
       
-      document.getElementById('resourcesWidget').innerHTML = resourcesHtml;
+      document.getElementById('resourcesWidget').innerHTML = resourcesHtml || '<p style="text-align:center; color:gray; padding:20px;">No critical resources</p>';
     } catch (err) {
-      console.error('Error loading resources:', err);
+      console.error('Error loading resources quick view:', err);
+      document.getElementById('resourcesWidget').innerHTML = '<p class="error">Failed to load resources</p>';
     }
   }
 

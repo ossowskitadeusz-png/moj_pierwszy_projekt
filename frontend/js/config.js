@@ -8,7 +8,8 @@ const CONFIG = {
     TASKS: 10000,        // 10 sekund
     MESSAGES: 3000,      // 3 sekundy
     TEAM: 30000,         // 30 sekund
-    FOLDERS: 20000       // 20 sekund
+    FOLDERS: 20000,       // 20 sekund
+    RESOURCES: 30000     // 30 sekund
   }
 };
 

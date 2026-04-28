@@ -19,7 +19,9 @@ const tasksRoutes = require('./routes/tasks.routes');
 const messagesRoutes = require('./routes/messages.routes');
 const foldersRoutes = require('./routes/folders.routes');
 const usersRoutes = require('./routes/users.routes');
-const chiefRoutes = require('./routes/chief.routes');  // ← NEW
+const chiefRoutes = require('./routes/chief.routes');
+const resourcesRoutes = require('./routes/resources.routes');
+const reportsRoutes = require('./routes/reports.routes');
 
 // ===== REJESTRACJA ROUTES =====
 app.use('/api/auth', authRoutes);
@@ -27,7 +29,9 @@ app.use('/api/tasks', tasksRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/folders', foldersRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/chief', chiefRoutes);  // ← NEW
+app.use('/api/chief', chiefRoutes);
+app.use('/api/resources', resourcesRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // ===== CATCH-ALL: Serwuj SPA =====
 app.get('*', (req, res) => {

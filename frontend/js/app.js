@@ -80,6 +80,8 @@ const app = {
       case ROUTES.FOLDERS: folders.load(); break;
       case ROUTES.APPROVAL: approval.load(); break;
       case ROUTES.CREW: if (window.crewMgmt) crewMgmt.load(); break;
+      case ROUTES.RESOURCES: if (window.resources) resources.load(); break;
+      case 'reports': if (window.reports) reports.load(); break;
     }
   },
 

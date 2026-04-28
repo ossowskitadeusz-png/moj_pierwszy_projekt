@@ -88,6 +88,9 @@
         <a href="#" onclick="app.navigate('folders')" class="nav-item" id="nav-folders">
           <i class="fa-solid fa-folder-open"></i> Technical Manuals
         </a>
+        <a href="#" onclick="app.navigate('reports')" class="nav-item" id="nav-reports">
+          <i class="fa-solid fa-file-excel"></i> Reports & Excel
+        </a>
         <a href="#" onclick="app.navigate('approval')" class="nav-item" id="approvalNav" style="display: none;">
           <i class="fa-solid fa-clipboard-check"></i> Approvals
         </a>
@@ -186,6 +189,14 @@
             <div class="dashboard-section card" style="margin-top: 20px;">
               <h2>Critical Alerts</h2>
               <div id="recentAlerts">Loading...</div>
+            </div>
+          </div>
+
+          <!-- MECHANIC REPORTS SECTION -->
+          <div id="mechanicReportsSection" class="dashboard-section card mechanic-only" style="margin-top: 20px; display: none;">
+            <h2>📋 Pending Inventory Reports</h2>
+            <div id="pendingReportsWidget" class="reports-grid">
+              <p class="placeholder">Loading reports...</p>
             </div>
           </div>
 
@@ -520,15 +531,298 @@
           </div>
         </section>
 
-        <!-- RESOURCES PAGE -->
+        <!-- RESOURCES MONITOR PAGE -->
         <section id="resourcesPage" class="page" style="display: none;">
-          <div class="page-header">
-            <h2>Resources Monitor</h2>
+          <div class="resources-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+            <h2>⛽ Resources Monitor</h2>
+            <div class="resources-tabs">
+              <button onclick="resources.switchTab('inventory')" class="tab-btn active" data-tab="inventory">📊 Inventory</button>
+              <button onclick="resources.switchTab('reports')" class="tab-btn" data-tab="reports">📋 My Reports</button>
+              <button onclick="resources.switchTab('trends')" class="tab-btn" data-tab="trends">📈 Trends</button>
+              <button onclick="resources.switchTab('assign')" class="tab-btn" data-tab="assign" id="assignTab" style="display:none;">✍️ Assign</button>
+              <button onclick="resources.switchTab('verify')" class="tab-btn" data-tab="verify" id="verifyTab" style="display:none;">✅ Verify</button>
+            </div>
           </div>
-          <div id="resourcesFullList" class="resources-grid">
-            <!-- Resources go here -->
+
+          <!-- TAB 1: INVENTORY -->
+          <div id="resources-tab-inventory" class="tab-content">
+            <div class="inventory-filters" style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+              <select onchange="resources.filterByCategory(this.value)" class="filter-select" style="padding:8px 12px; background:#1e2340; color:#e2e8f0; border:1px solid #3a4060; border-radius:6px;">
+                <option value="">All Categories</option>
+                <option value="fuel">⛽ Fuel</option>
+                <option value="lube_oil">🛢️ Lube Oils</option>
+                <option value="hydraulic">💧 Hydraulic</option>
+                <option value="water_treatment">🌊 Water Treatment</option>
+                <option value="gas_bottles">🔋 Gas Bottles</option>
+                <option value="chemicals">🧪 Chemicals</option>
+              </select>
+              <button onclick="resources.loadInventory()" class="btn-ghost" style="padding:8px 12px;">🔄 Refresh</button>
+            </div>
+            <div id="inventoryGrid" class="inventory-grid">Loading inventory...</div>
+          </div>
+
+          <!-- TAB 2: MY REPORTS -->
+          <div id="resources-tab-reports" class="tab-content" style="display:none;">
+            <div id="myReportsList" class="reports-list">Loading your reports...</div>
+          </div>
+
+          <!-- TAB 3: TRENDS -->
+          <div id="resources-tab-trends" class="tab-content" style="display:none;">
+            <div id="trendsContainer">Loading trends...</div>
+          </div>
+
+          <!-- TAB 4: ASSIGN (Chief only) -->
+          <div id="resources-tab-assign" class="tab-content" style="display:none;">
+            <div id="assignFormContainer">Loading...</div>
+          </div>
+
+          <!-- TAB 5: VERIFY (Chief only) -->
+          <div id="resources-tab-verify" class="tab-content" style="display:none;">
+            <div id="verifyReportsList">Loading reports...</div>
           </div>
         </section>
+
+        <!-- RESOURCE DETAIL MODAL -->
+        <div id="resourceDetailModal" class="modal" style="display: none;">
+          <div class="modal-content modal-lg">
+            <span onclick="ui.closeModal('resourceDetailModal')" class="modal-close">&times;</span>
+            <div id="resourceDetailContent">Loading...</div>
+          </div>
+        </div>
+
+        <!-- SUBMIT REPORT MODAL -->
+        <div id="submitReportModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <span onclick="ui.closeModal('submitReportModal')" class="modal-close">&times;</span>
+            <h2>📋 Submit Inventory Report</h2>
+            <form onsubmit="resources.handleSubmitReport(event)">
+              <input type="hidden" id="submitReportId">
+              <p style="color:#888; margin-bottom:15px;">Resource: <strong id="submitResourceName">-</strong></p>
+              
+              <div class="form-group">
+                <label>Current Level (<span id="submitUnitLabel">Units</span>) *</label>
+                <input type="number" id="submitLevel" step="0.01" min="0" required placeholder="e.g. 28000">
+              </div>
+
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea id="submitNotes" rows="3" placeholder="Any observations..."></textarea>
+              </div>
+
+              <button type="submit" class="btn-primary btn-block">Submit Report</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- FUEL SOUNDING MODAL -->
+        <div id="fuelSoundingModal" class="modal" style="display: none;">
+          <div class="modal-content modal-lg" style="max-width:900px;">
+            <span onclick="ui.closeModal('fuelSoundingModal')" class="modal-close">&times;</span>
+            <h2>⛽ Fuel Tank Sounding Report</h2>
+            <p style="color:#888; margin-bottom:15px;">Enter sounding measurements for each tank below:</p>
+            
+            <form onsubmit="resources.handleSubmitFuelSounding(event)">
+              <input type="hidden" id="fuelReportId">
+              
+              <div id="fuelSoundingTanks" class="sounding-table">
+                Loading tanks...
+              </div>
+
+              <div class="form-group" style="margin-top:15px;">
+                <label>General Notes</label>
+                <textarea id="fuelSoundingNotes" rows="2" placeholder="Weather, sea conditions, etc."></textarea>
+              </div>
+
+              <button type="submit" class="btn-primary btn-block">⛽ Submit Fuel Sounding</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TREND CHART MODAL -->
+        <div id="trendChartModal" class="modal" style="display: none;">
+          <div class="modal-content modal-lg" style="max-width:800px;">
+            <span onclick="ui.closeModal('trendChartModal')" class="modal-close">&times;</span>
+            <div id="trendChartContent">Loading chart...</div>
+          </div>
+        </div>
+
+        <!-- REPORTS PAGE (dla Crew & Chief) -->
+        <section id="reportsPage" class="page" style="display: none;">
+          <div class="reports-header">
+            <h2>📊 Reports Management</h2>
+            <div class="reports-tabs">
+              <button onclick="reports.switchTab('my-reports')" class="tab-btn active">📋 My Reports</button>
+              <button onclick="reports.switchTab('all-reports')" class="tab-btn" id="allReportsTab" style="display:none;">📈 All Reports (Chief)</button>
+              <button onclick="reports.switchTab('generate')" class="tab-btn" id="generateTab" style="display:none;">⚙️ Generate Monthly</button>
+            </div>
+          </div>
+
+          <!-- TAB 1: MY REPORTS (Crew member view) -->
+          <div id="myReportsTab" class="tab-content active">
+            <div class="reports-filters" style="display:flex; gap:10px; margin-bottom:20px;">
+              <select onchange="reports.filterByStatus(this.value)" class="filter-select">
+                <option value="">All Status</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="submitted">📤 Submitted</option>
+                <option value="verified">✅ Verified</option>
+                <option value="rejected">❌ Rejected</option>
+                <option value="overdue">🚨 Overdue</option>
+              </select>
+
+              <select onchange="reports.filterByType(this.value)" class="filter-select">
+                <option value="">All Types</option>
+                <option value="fuel_sounding">⛽ Fuel Sounding</option>
+                <option value="lube_oil_check">🛢️ Lube Oil Check</option>
+                <option value="hydraulic_check">💧 Hydraulic Check</option>
+                <option value="water_treatment_check">🌊 Water Treatment</option>
+                <option value="gas_bottles_count">🔋 Gas Bottles</option>
+                <option value="chemicals_stock">🧪 Chemicals</option>
+              </select>
+            </div>
+
+            <div id="myReportsList" class="reports-list">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- TAB 2: ALL REPORTS (Chief view) -->
+          <div id="allReportsTabContent" class="tab-content" style="display: none;">
+            <div class="reports-controls" style="display:flex; gap:10px; margin-bottom:20px;">
+              <input type="text" id="crewFilter" placeholder="Filter by crew..." onkeyup="reports.filterAllReports()" class="search-input">
+              <select onchange="reports.filterAllReports()" id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="submitted">Submitted</option>
+                <option value="verified">Verified</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+
+            <table id="allReportsTable" class="reports-table">
+              <thead>
+                <tr>
+                  <th>Report ID</th>
+                  <th>Type</th>
+                  <th>Crew Member</th>
+                  <th>Due Date</th>
+                  <th>Submitted</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="allReportsBody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TAB 3: GENERATE MONTHLY REPORT -->
+          <div id="generateTabContent" class="tab-content" style="display: none;">
+            <div class="generate-panel">
+              <h3>Generate Monthly Report for Company</h3>
+              
+              <div class="form-group">
+                <label>Select Month & Year</label>
+                <input type="month" id="reportMonth" class="form-control">
+              </div>
+
+              <div class="generate-stats">
+                <div class="stat-box">
+                  <span class="stat-label">Pending Reports:</span>
+                  <span class="stat-value" id="genStatPending">0</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-label">Submitted Reports:</span>
+                  <span class="stat-value" id="genStatSubmitted">0</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-label">Verified Reports:</span>
+                  <span class="stat-value" id="genStatVerified">0</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-label">Overdue Reports:</span>
+                  <span class="stat-value" id="genStatOverdue">0</span>
+                </div>
+              </div>
+
+              <button onclick="reports.generateMonthlyReport()" class="btn-primary btn-large">
+                📥 Download Monthly Report (Excel)
+              </button>
+
+              <p style="margin-top: 20px; color: #888; font-size: 12px;">
+                ⚠️ Only verified reports will be included in the final document.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORT DETAIL MODAL -->
+        <div id="reportDetailModal" class="modal" style="display: none;">
+          <div class="modal-content modal-lg">
+            <span onclick="ui.closeModal('reportDetailModal')" class="modal-close">&times;</span>
+            <div id="reportDetailContent">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- UPLOAD EXCEL MODAL -->
+        <div id="uploadModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <span onclick="ui.closeModal('uploadModal')" class="modal-close">&times;</span>
+            <h2>Upload Completed Report</h2>
+            
+            <div class="upload-area" id="dropZone">
+              <div class="upload-icon">📄</div>
+              <p>Drag & drop your Excel file here</p>
+              <p style="font-size: 12px; color: #888;">or click to select file</p>
+              
+              <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="reports.handleFileSelect(event)">
+            </div>
+
+            <button onclick="document.getElementById('fileInput').click()" class="btn-secondary btn-block" style="margin-top: 20px;">
+              📁 Select File
+            </button>
+
+            <button id="uploadBtn" onclick="reports.submitReport()" class="btn-primary btn-block" style="margin-top: 10px; display: none;">
+              📤 Upload Report
+            </button>
+
+            <div id="uploadStatus" style="margin-top: 15px;"></div>
+          </div>
+        </div>
+
+        <!-- VERIFY REPORT MODAL (Chief) -->
+        <div id="verifyModal" class="modal" style="display: none;">
+          <div class="modal-content">
+            <span onclick="ui.closeModal('verifyModal')" class="modal-close">&times;</span>
+            <h2>Verify Report</h2>
+            
+            <div id="verifyReportInfo" style="margin-bottom: 20px; padding: 15px; background: #252d4a; border-radius: 5px;">
+              <!-- Report summary -->
+            </div>
+
+            <form id="verifyForm" onsubmit="reports.handleVerify(event)">
+              <div class="form-group">
+                <label>Verdict</label>
+                <div style="display:flex; gap:20px;">
+                  <label><input type="radio" name="verdict" value="true" required> ✅ Approve</label>
+                  <label><input type="radio" name="verdict" value="false"> ❌ Reject</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Chief's Notes (Optional)</label>
+                <textarea id="verifyNotes" rows="4" placeholder="e.g., Data looks good, minor discrepancy in Tank No.1..."></textarea>
+              </div>
+
+              <div class="form-actions" style="display:flex; gap:10px;">
+                <button type="submit" class="btn-primary" style="flex:1;">Submit Verification</button>
+                <button type="button" onclick="ui.closeModal('verifyModal')" class="btn-secondary" style="flex:1;">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <!-- ALERTS PAGE -->
         <section id="alertsPage" class="page" style="display: none;">
@@ -633,6 +927,8 @@
   <script src="js/modules/chat.js"></script>
   <script src="js/modules/folders.js"></script>
   <script src="js/modules/approval.js"></script>
+  <script src="js/modules/resources.js"></script>
+  <script src="js/modules/reports.js"></script>
   
   <!-- GŁÓWNA APLIKACJA -->
   <script src="js/app.js"></script>

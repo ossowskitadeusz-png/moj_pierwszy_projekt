@@ -62,8 +62,12 @@ db.serialize(() => {
   db.run('DELETE FROM task_approvals');
   db.run('DELETE FROM tasks');
   db.run('DELETE FROM task_templates');
+  db.run('DELETE FROM fuel_soundings');
+  db.run('DELETE FROM inventory_history');
+  db.run('DELETE FROM resource_assignments');
   db.run('DELETE FROM resource_reports');
   db.run('DELETE FROM resources');
+  db.run('DELETE FROM tank_definitions');
   db.run('DELETE FROM sectors');
   db.run('DELETE FROM folders');
   db.run('DELETE FROM users');
@@ -170,32 +174,83 @@ setTimeout(() => {
     });
   }, 500);
 
-  // ===== RESOURCES =====
-  const resources = [
-    { type: 'HFO', level: 87, capacity: 1000 },
-    { type: 'MDO', level: 92, capacity: 300 },
-    { type: 'Lube_Oil', level: 78, capacity: 150 },
-    { type: 'Cooling_Water', level: 85, capacity: 500 },
-    { type: 'Battery', level: 95, capacity: 100 }
+  // ===== RESOURCES (14 typów zasobów) =====
+  console.log('\n⛽ Seeding Resources & Tanks...\n');
+
+  const resourcesData = [
+    // FUEL
+    { name: 'Heavy Fuel Oil (HFO)', type: 'HFO', category: 'fuel', unit: 'MT', current: 750, capacity: 900, critical: 150, warning: 300, supplier: 'Shell Marine', location: 'Tank Deck' },
+    { name: 'Marine Diesel Oil (MDO)', type: 'MDO', category: 'fuel', unit: 'MT', current: 85, capacity: 100, critical: 20, warning: 40, supplier: 'Shell Marine', location: 'Engine Room' },
+    { name: 'Marine Gas Oil (MGO)', type: 'MGO', category: 'fuel', unit: 'MT', current: 20, capacity: 25, critical: 5, warning: 10, supplier: 'Port Bunker Station', location: 'Engine Room' },
+
+    // LUBE OILS
+    { name: 'Main Engine Lube Oil SAE 40', type: 'Lube_Oil', category: 'lube_oil', unit: 'Liters', current: 28000, capacity: 30000, critical: 5000, warning: 10000, supplier: 'Total Lubricants', location: 'Engine Room' },
+    { name: 'Generator Lube Oil SAE 40', type: 'Lube_Oil', category: 'lube_oil', unit: 'Liters', current: 18000, capacity: 20000, critical: 3000, warning: 8000, supplier: 'Mobil Oil', location: 'Aux Engine Room' },
+    { name: 'Hydraulic Oil ISO 46', type: 'Hydraulic', category: 'hydraulic', unit: 'Liters', current: 13500, capacity: 15000, critical: 2000, warning: 5000, supplier: 'BP Hydraulics', location: 'Pump Room' },
+
+    // WATER TREATMENT
+    { name: 'Cooling Water Treatment Chemical', type: 'Chemicals', category: 'water_treatment', unit: 'Liters', current: 18, capacity: 20, critical: 2, warning: 5, supplier: 'Chemlab Marine', location: 'Engine Room' },
+    { name: 'Boiler Water Treatment', type: 'Chemicals', category: 'water_treatment', unit: 'Liters', current: 8, capacity: 10, critical: 1, warning: 3, supplier: 'Nalco', location: 'Boiler Deck' },
+
+    // GAS BOTTLES
+    { name: 'Oxygen (O2) Bottles', type: 'Gas_Bottles', category: 'gas_bottles', unit: 'Units', current: 5, capacity: 6, critical: 0, warning: 1, supplier: 'Local Gas Supplier', location: 'Workshops' },
+    { name: 'Nitrogen (N2) Bottles', type: 'Gas_Bottles', category: 'gas_bottles', unit: 'Units', current: 3, capacity: 4, critical: 0, warning: 1, supplier: 'Local Gas Supplier', location: 'Workshops' },
+    { name: 'Acetylene Bottles', type: 'Gas_Bottles', category: 'gas_bottles', unit: 'Units', current: 1, capacity: 2, critical: 0, warning: 1, supplier: 'Local Gas Supplier', location: 'Workshops' },
+
+    // CHEMICALS
+    { name: 'Rust Preventive Oil', type: 'Chemicals', category: 'chemicals', unit: 'Liters', current: 9, capacity: 10, critical: 1, warning: 3, supplier: 'Tectyl Marine', location: 'Engine Room' },
+    { name: 'Degreaser/Cleaner', type: 'Chemicals', category: 'chemicals', unit: 'Liters', current: 7, capacity: 8, critical: 0.5, warning: 2, supplier: 'Chemlab Marine', location: 'Workshops' },
+    { name: 'Engine Room Disinfectant', type: 'Chemicals', category: 'chemicals', unit: 'Liters', current: 4, capacity: 5, critical: 0.5, warning: 1.5, supplier: 'Chemlab Marine', location: 'Engine Room' }
   ];
 
-  resources.forEach(res => {
-    const status = res.level < 25 ? 'critical' : res.level < 40 ? 'warning' : res.level > 90 ? 'optimal' : 'normal';
-    
+  resourcesData.forEach(resource => {
+    const status = resource.current > (resource.capacity * 0.8) ? 'optimal' :
+                   resource.current > (resource.capacity * 0.5) ? 'normal' :
+                   resource.current > resource.critical ? 'warning' : 'critical';
+
     db.run(
-      `INSERT INTO resources (resource_type, current_level, max_capacity, status, reported_by, last_verified)
-       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [res.type, res.level, res.capacity, status, userIds['jose.santos']],
+      `INSERT INTO resources 
+       (name, resource_type, category, current_level, max_capacity, unit, status, critical_threshold, warning_threshold, supplier, location, reported_by, last_updated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [resource.name, resource.type, resource.category, resource.current, resource.capacity, resource.unit,
+       status, resource.critical, resource.warning, resource.supplier, resource.location, userIds['jose.santos']],
       (err) => {
-        if (err) console.error(`❌ Error creating resource ${res.type}:`, err);
-        else console.log(`✅ Resource created: ${res.type} (${res.level}%)`);
+        if (err) console.error(`❌ Error creating resource: ${resource.name}`, err);
+        else console.log(`✅ Resource created: ${resource.name} (${resource.current}/${resource.capacity} ${resource.unit})`);
+      }
+    );
+  });
+
+  // ===== TANK DEFINITIONS (11 zbiorników) =====
+  const tankDefinitions = [
+    { name: 'HFO Tank No.1 Port', code: 'HFO-P1', type: 'HFO', capacity_cbm: 400, location: 'Port Side, Tank Deck' },
+    { name: 'HFO Tank No.1 Starboard', code: 'HFO-S1', type: 'HFO', capacity_cbm: 400, location: 'Starboard Side, Tank Deck' },
+    { name: 'HFO Settling Tank', code: 'HFO-ST', type: 'HFO', capacity_cbm: 50, location: 'Engine Room' },
+    { name: 'HFO Service Tank', code: 'HFO-SV', type: 'HFO', capacity_cbm: 30, location: 'Engine Room' },
+    { name: 'MDO Daily Tank', code: 'MDO-DT', type: 'MDO', capacity_cbm: 50, location: 'Engine Room' },
+    { name: 'MDO Reserve Tank', code: 'MDO-RT', type: 'MDO', capacity_cbm: 40, location: 'Tank Deck' },
+    { name: 'MGO Service Tank', code: 'MGO-SV', type: 'MGO', capacity_cbm: 25, location: 'Engine Room' },
+    { name: 'Main Engine Lube Oil Tank', code: 'LUBE-ME', type: 'Lube_Oil', capacity_cbm: 30, location: 'Engine Room' },
+    { name: 'Generator Lube Oil Tank', code: 'LUBE-GEN', type: 'Lube_Oil', capacity_cbm: 20, location: 'Aux Engine Room' },
+    { name: 'Hydraulic Oil Tank', code: 'HYD-01', type: 'Hydraulic', capacity_cbm: 15, location: 'Pump Room' },
+    { name: 'Fresh Water Cooling Tank', code: 'COOL-FW', type: 'Cooling_Water', capacity_cbm: 40, location: 'Engine Room' }
+  ];
+
+  tankDefinitions.forEach(tank => {
+    db.run(
+      `INSERT INTO tank_definitions (tank_name, tank_code, resource_type, capacity_cbm, capacity_liters, location, density_default)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [tank.name, tank.code, tank.type, tank.capacity_cbm, tank.capacity_cbm * 1000, tank.location, 890],
+      (err) => {
+        if (err) console.error(`❌ Error creating tank: ${tank.name}`, err);
+        else console.log(`✅ Tank created: ${tank.name}`);
       }
     );
   });
 
   // ===== TASKS =====
   setTimeout(() => {
-    db.all('SELECT id, name FROM sectors LIMIT 4', (err, sectors) => {
+    db.all('SELECT id, name FROM sectors LIMIT 6', (err, sectors) => {
       if (!sectors) return;
 
       const tasks = [
@@ -241,12 +296,12 @@ setTimeout(() => {
         }
       ];
 
-      tasks.forEach((task, idx) => {
+      tasks.forEach(task => {
         db.run(
           `INSERT INTO tasks (title, description, assigned_to, created_by, status, priority, 
                              sector_id, estimated_hours, due_date, approval_status, assigned_at)
            VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, DATE('now', '+3 days'), 'pending', CURRENT_TIMESTAMP)`,
-          [task.title, task.description, task.assigned_to, userIds['jose.santos'], 
+          [task.title, task.description, task.assigned_to, userIds['jose.santos'],
            task.priority, task.sector_id, task.estimated_hours],
           (err) => {
             if (err) console.error(`❌ Error creating task:`, err);
@@ -270,6 +325,52 @@ setTimeout(() => {
     );
   }, 1500);
 
+  // ===== RESOURCE ASSIGNMENTS (Chief przydzielił raporty mechanikom) =====
+  setTimeout(() => {
+    console.log('\n📋 Creating resource assignments...\n');
+
+    const assignments = [
+      { crew: 'john.smith', reportType: 'fuel_sounding', resourceName: 'Heavy Fuel Oil (HFO)', frequency: 'weekly' },
+      { crew: 'lars.hansen', reportType: 'lube_oil_check', resourceName: 'Main Engine Lube Oil SAE 40', frequency: 'monthly' },
+      { crew: 'maria.rodriguez', reportType: 'hydraulic_check', resourceName: 'Hydraulic Oil ISO 46', frequency: 'monthly' },
+      { crew: 'kwang.lee', reportType: 'water_treatment_check', resourceName: 'Cooling Water Treatment Chemical', frequency: 'monthly' },
+      { crew: 'john.smith', reportType: 'gas_bottles_count', resourceName: 'Oxygen (O2) Bottles', frequency: 'monthly' },
+      { crew: 'maria.rodriguez', reportType: 'chemicals_stock', resourceName: 'Rust Preventive Oil', frequency: 'monthly' }
+    ];
+
+    assignments.forEach(assign => {
+      db.get(
+        'SELECT id FROM resources WHERE name = ?',
+        [assign.resourceName],
+        (err, resource) => {
+          if (resource) {
+            // Create the assignment
+            db.run(
+              `INSERT INTO resource_assignments (crew_member_id, report_type, resource_id, frequency, assigned_by, start_date, status)
+               VALUES (?, ?, ?, ?, ?, DATE('now'), 'active')`,
+              [userIds[assign.crew], assign.reportType, resource.id, assign.frequency, userIds['jose.santos']],
+              (err) => {
+                if (err) console.error(`❌ Error creating assignment:`, err);
+                else console.log(`✅ Assignment: ${assign.reportType} → ${assign.crew}`);
+              }
+            );
+
+            // Create a pending report for this assignment
+            db.run(
+              `INSERT INTO resource_reports (report_type, resource_id, assigned_to, assigned_by, due_date, status)
+               VALUES (?, ?, ?, ?, DATE('now', '+7 days'), 'pending')`,
+              [assign.reportType, resource.id, userIds[assign.crew], userIds['jose.santos']],
+              (err) => {
+                if (err) console.error(`❌ Error creating pending report:`, err);
+                else console.log(`✅ Pending report created for ${assign.crew}: ${assign.reportType}`);
+              }
+            );
+          }
+        }
+      );
+    });
+  }, 2000);
+
   // ===== INITIAL ALERTS =====
   setTimeout(() => {
     db.run(
@@ -281,21 +382,22 @@ setTimeout(() => {
         else console.log('✅ Welcome alert created');
       }
     );
-  }, 2000);
+  }, 2500);
 
 }, 500);
 
 console.log('\n⏳ Seeding in progress...');
-console.log('This may take 2-3 seconds. Please wait...\n');
+console.log('This may take 3-4 seconds. Please wait...\n');
 
   setTimeout(() => {
-    console.log('🎉 Seeding completed!\n');
+    console.log('\n🎉 Seeding completed!\n');
     console.log('📋 Test Credentials:');
     console.log('   Chief Engineer: jose.santos / pass123');
     console.log('   Mechanic 1:     john.smith / pass123');
     console.log('   Mechanic 2:     lars.hansen / pass123');
     console.log('   Mechanic 3:     maria.rodriguez / pass123');
     console.log('   Mechanic 4:     kwang.lee / pass123\n');
+    console.log('⛽ Resources: 14 types, 11 tanks, 6 assignments created');
     process.exit(0);
-  }, 3000);
+  }, 4000);
 });

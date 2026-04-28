@@ -57,22 +57,27 @@ db.serialize(() => {
     else console.log('✅ Sectors table created');
   });
 
-  // ===== RESOURCES (Fuel, Oil, Coolant, Battery) =====
+  // ===== RESOURCES (Rozbudowana - Fuel, Oil, Chemicals, Gas, etc.) =====
   db.run(`
     CREATE TABLE IF NOT EXISTS resources (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      resource_type TEXT UNIQUE NOT NULL CHECK(resource_type IN ('HFO', 'MDO', 'Lube_Oil', 'Cooling_Water', 'Battery')),
+      name TEXT UNIQUE NOT NULL,
+      resource_type TEXT CHECK(resource_type IN ('HFO', 'MDO', 'MGO', 'Lube_Oil', 'Hydraulic', 'Cooling_Water', 'Battery', 'Chemicals', 'Gas_Bottles')),
+      category TEXT CHECK(category IN ('fuel', 'lube_oil', 'hydraulic', 'water_treatment', 'gas_bottles', 'chemicals')),
       current_level REAL NOT NULL,
       max_capacity REAL NOT NULL,
-      unit TEXT DEFAULT '%',
+      unit TEXT DEFAULT 'Liters' CHECK(unit IN ('Liters', 'MT', 'Units', 'Bottles', '%')),
       status TEXT DEFAULT 'normal' CHECK(status IN ('critical', 'warning', 'normal', 'optimal')),
       critical_threshold REAL DEFAULT 20,
       warning_threshold REAL DEFAULT 40,
-      last_refill DATE,
-      refill_interval INTEGER,
+      reorder_point REAL,
       location TEXT,
-      reported_by INTEGER,
+      supplier TEXT,
+      last_updated DATETIME,
       last_verified DATETIME,
+      reported_by INTEGER,
+      is_critical INTEGER DEFAULT 0,
+      notes TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(reported_by) REFERENCES users(id) ON DELETE SET NULL
@@ -82,27 +87,128 @@ db.serialize(() => {
     else console.log('✅ Resources table created');
   });
 
-  // ===== RESOURCE REPORTS (Field Reports) =====
+  // ===== RESOURCE REPORTS (Rozbudowana - Formularz raportowania) =====
   db.run(`
     CREATE TABLE IF NOT EXISTS resource_reports (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      resource_type TEXT NOT NULL,
-      reported_by INTEGER NOT NULL,
-      current_level REAL NOT NULL,
-      notes TEXT,
-      photo_url TEXT,
+      report_type TEXT NOT NULL CHECK(report_type IN ('fuel_sounding', 'lube_oil_check', 'hydraulic_check', 'water_treatment_check', 'gas_bottles_count', 'chemicals_stock')),
+      resource_id INTEGER NOT NULL,
+      assigned_to INTEGER NOT NULL,
+      assigned_by INTEGER NOT NULL,
+      due_date DATE NOT NULL,
+      submitted_date DATETIME,
+      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'submitted', 'verified', 'overdue', 'rejected')),
+      submission_notes TEXT,
+      submitted_by INTEGER,
       verified_by INTEGER,
-      verification_time DATETIME,
+      verification_notes TEXT,
+      verified_at DATETIME,
+      readings TEXT,
+      photos_json TEXT,
       acknowledged_by_chief INTEGER,
       acknowledged_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(reported_by) REFERENCES users(id) ON DELETE CASCADE,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE,
+      FOREIGN KEY(assigned_to) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(assigned_by) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(submitted_by) REFERENCES users(id) ON DELETE SET NULL,
       FOREIGN KEY(verified_by) REFERENCES users(id) ON DELETE SET NULL,
       FOREIGN KEY(acknowledged_by_chief) REFERENCES users(id) ON DELETE SET NULL
     )
   `, (err) => {
     if (err) console.error('❌ Error creating resource_reports table:', err);
     else console.log('✅ Resource Reports table created');
+  });
+
+  // ===== TANK DEFINITIONS (Konkretne zbiorniki na statku) =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS tank_definitions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tank_name TEXT UNIQUE NOT NULL,
+      tank_code TEXT UNIQUE,
+      resource_type TEXT CHECK(resource_type IN ('HFO', 'MDO', 'MGO', 'Lube_Oil', 'Hydraulic', 'Cooling_Water')),
+      capacity_cbm REAL,
+      capacity_liters REAL,
+      location TEXT,
+      sounding_table_ref TEXT,
+      density_default REAL DEFAULT 890,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) console.error('❌ Error creating tank_definitions table:', err);
+    else console.log('✅ Tank Definitions table created');
+  });
+
+  // ===== FUEL SOUNDINGS (Szczegółowe sondowania per zbiornik) =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS fuel_soundings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      report_id INTEGER NOT NULL,
+      tank_id INTEGER NOT NULL,
+      sounding_mm REAL NOT NULL,
+      density_kg_cbm REAL DEFAULT 890,
+      temperature_celsius REAL,
+      calculated_mt REAL,
+      remarks TEXT,
+      photo_url TEXT,
+      reported_by INTEGER NOT NULL,
+      reported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(report_id) REFERENCES resource_reports(id) ON DELETE CASCADE,
+      FOREIGN KEY(tank_id) REFERENCES tank_definitions(id) ON DELETE CASCADE,
+      FOREIGN KEY(reported_by) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+    if (err) console.error('❌ Error creating fuel_soundings table:', err);
+    else console.log('✅ Fuel Soundings table created');
+  });
+
+  // ===== INVENTORY HISTORY (Trendy zużycia zasobów) =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS inventory_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      resource_id INTEGER NOT NULL,
+      level_before REAL,
+      level_after REAL,
+      change_amount REAL,
+      change_reason TEXT CHECK(change_reason IN ('consumption', 'refill', 'report_submitted', 'adjustment', 'inventory_check')),
+      consumption_rate_per_day REAL,
+      days_until_critical INTEGER,
+      recorded_by INTEGER,
+      recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE,
+      FOREIGN KEY(recorded_by) REFERENCES users(id) ON DELETE SET NULL
+    )
+  `, (err) => {
+    if (err) console.error('❌ Error creating inventory_history table:', err);
+    else console.log('✅ Inventory History table created');
+  });
+
+  // ===== RESOURCE ASSIGNMENTS (Przydzielanie raportów crew) =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS resource_assignments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      crew_member_id INTEGER NOT NULL,
+      report_type TEXT NOT NULL,
+      resource_id INTEGER,
+      frequency TEXT DEFAULT 'monthly' CHECK(frequency IN ('daily', 'weekly', 'monthly', 'quarterly', 'annually', 'as_needed')),
+      assigned_by INTEGER NOT NULL,
+      assigned_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      start_date DATE,
+      end_date DATE,
+      status TEXT DEFAULT 'active' CHECK(status IN ('active', 'paused', 'completed', 'cancelled')),
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(crew_member_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(assigned_by) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE SET NULL
+    )
+  `, (err) => {
+    if (err) console.error('❌ Error creating resource_assignments table:', err);
+    else console.log('✅ Resource Assignments table created');
   });
 
   // ===== TASKS (Extended) =====
