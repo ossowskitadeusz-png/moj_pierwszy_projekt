@@ -51,6 +51,15 @@ const app = {
     document.getElementById('userNameDisplay').textContent = this.currentUser.name;
     document.getElementById('userRoleDisplay').textContent = this.currentUser.role === 'chief_engineer' ? 'Chief Engineer' : 'Engineer';
     document.getElementById('userAvatar').textContent = this.currentUser.name[0].toUpperCase();
+    
+    // Ukryj Crew Management dla zwykłych mechaników
+    if (this.currentUser.role !== 'chief_engineer') {
+      document.getElementById('nav-crew').style.display = 'none';
+      document.getElementById('nav-watchAssignments').style.display = 'none';
+    }
+
+    // Inicjalizacja modułów dashboardu
+    if (window.watch) watch.load();
   },
 
   navigate(page) {
@@ -69,11 +78,7 @@ const app = {
     // Load module data
     switch(page) {
       case ROUTES.DASHBOARD: 
-        if (this.currentUser.role === 'chief_engineer') {
-          if (window.chiefDashboard) chiefDashboard.load();
-        } else {
-          dashboard.load(); 
-        }
+        dashboard.load();
         break;
       case ROUTES.TASKS: tasks.load(); break;
       case ROUTES.CHAT: chat.load(); break;
@@ -82,6 +87,15 @@ const app = {
       case ROUTES.CREW: if (window.crewMgmt) crewMgmt.load(); break;
       case ROUTES.RESOURCES: if (window.resources) resources.load(); break;
       case 'reports': if (window.reports) reports.load(); break;
+      case 'watch': if (window.watch) watch.load(); break;
+      case 'watchAssignments': 
+        if (this.currentUser.role === 'chief_engineer') {
+          if (window.watchCrew) watchCrew.load();
+        } else {
+          utils.showNotification('Access denied. Chief only.', 'error');
+          this.navigate('dashboard');
+        }
+        break;
     }
   },
 

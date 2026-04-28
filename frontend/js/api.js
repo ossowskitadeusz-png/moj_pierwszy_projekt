@@ -141,6 +141,20 @@ class API {
     listMyFiles: () => API.request('/reports/my-files')
   };
 
+  // ===== WATCH MANAGEMENT =====
+  static watch = {
+    getToday: () => API.request('/watch-management/today'),
+    getMyStatus: () => API.request('/watch-management/my-status'),
+    logParameters: (data) => API.request('/watch-management/log-parameters', 'POST', data)
+  };
+
+  // ===== CREW MANAGEMENT =====
+  static crew = {
+    getEligible: () => API.request('/crew/eligible'),
+    getAssignments: () => API.request('/crew/assignments'),
+    saveAssignments: (assignments) => API.request('/crew/save-assignments', 'POST', { assignments })
+  };
+
   // ===== RESOURCES (dostępne dla wszystkich zalogowanych) =====
   static resources = {
     getInventory: () => API.request('/resources/inventory'),

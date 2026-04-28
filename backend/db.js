@@ -17,7 +17,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT DEFAULT 'mechanic' CHECK(role IN ('mechanic', 'chief_engineer', 'admin')),
+      role TEXT DEFAULT 'mechanic' CHECK(role IN ('mechanic', 'chief_engineer', 'admin', 'dayman')),
       department TEXT DEFAULT 'engine_room',
       status TEXT DEFAULT 'online' CHECK(status IN ('online', 'offline', 'away', 'on_leave')),
       sector_assignment INTEGER,
@@ -407,7 +407,136 @@ db.serialize(() => {
     else console.log('✅ Maintenance Schedule table created');
   });
 
-  console.log('\n✅ All tables created successfully!\n');
+  // ===== [TIER 1] WATCH PHASES & SCHEDULES =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS watch_schedules (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      schedule_name TEXT NOT NULL,
+      vessel_condition TEXT CHECK(vessel_condition IN ('at_sea', 'in_port', 'anchorage', 'emergency')),
+      morning_start TIME,
+      morning_end TIME,
+      lunch_start TIME,
+      lunch_end TIME,
+      rest_start TIME,
+      rest_end TIME,
+      night_start TIME,
+      night_end TIME,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) console.error('❌ watch_schedules:', err);
+    else console.log('✅ Watch Schedules table');
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS watch_phases (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      phase_code TEXT UNIQUE NOT NULL,
+      phase_name TEXT NOT NULL,
+      start_time TIME NOT NULL,
+      end_time TIME NOT NULL,
+      responsible_role TEXT,
+      vessel_condition TEXT DEFAULT 'at_sea',
+      description TEXT
+    )
+  `, (err) => {
+    if (err) console.error('❌ watch_phases:', err);
+    else console.log('✅ Watch Phases table');
+  });
+
+  // ===== [TIER 1] ALERTS & NOTIFICATIONS =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS watch_alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      alert_date DATE NOT NULL,
+      alert_time TIME,
+      mechanic_id INTEGER,
+      alert_type TEXT CHECK(alert_type IN ('checklist_due', 'phase_change', 'stcw_warning', 'engine_alarm')),
+      severity TEXT DEFAULT 'info',
+      acknowledged INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(mechanic_id) REFERENCES users(id)
+    )
+  `, (err) => {
+    if (err) console.error('❌ watch_alerts:', err);
+    else console.log('✅ Watch Alerts table');
+  });
+
+  // ===== [TIER 1] ENGINE PARAMETERS (HISTORY & TRENDS) =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS engine_parameters (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      log_date DATE NOT NULL,
+      log_time TIME NOT NULL,
+      mechanic_id INTEGER NOT NULL,
+      hfo_tank_level_mt REAL,
+      main_engine_temp REAL,
+      main_engine_press REAL,
+      gen_load REAL,
+      recorded_by_role TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(mechanic_id) REFERENCES users(id)
+    )
+  `, (err) => {
+    if (err) console.error('❌ engine_parameters:', err);
+    else console.log('✅ Engine Parameters table');
+  });
+
+  // ===== [TIER 1] WATCH HANDOVERS & STCW COMPLIANCE =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS watch_handovers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      handover_date DATE NOT NULL,
+      from_mechanic_id INTEGER NOT NULL,
+      to_mechanic_id INTEGER NOT NULL,
+      engine_status TEXT,
+      outstanding_issues TEXT,
+      handover_acknowledged INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) console.error('❌ watch_handovers:', err);
+    else console.log('✅ Watch Handovers table');
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS stcw_compliance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      mechanic_id INTEGER NOT NULL,
+      tracking_date DATE NOT NULL,
+      rest_hours REAL,
+      is_compliant INTEGER DEFAULT 1,
+      FOREIGN KEY(mechanic_id) REFERENCES users(id),
+      UNIQUE(mechanic_id, tracking_date)
+    )
+  `, (err) => {
+    if (err) console.error('❌ stcw_compliance:', err);
+    else console.log('✅ STCW Compliance table');
+  });
+
+  // ===== REFACTORED DAILY ASSIGNMENT =====
+  db.run(`
+    CREATE TABLE IF NOT EXISTS daily_watch_assignment_v2 (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      watch_date DATE NOT NULL UNIQUE,
+      morning_mechanic_id INTEGER,
+      morning_dayman_id INTEGER,
+      afternoon_mechanic_id INTEGER,
+      afternoon_dayman_id INTEGER,
+      night_mechanic_id INTEGER,
+      night_dayman_id INTEGER,
+      vessel_condition TEXT DEFAULT 'at_sea',
+      FOREIGN KEY(morning_mechanic_id) REFERENCES users(id),
+      FOREIGN KEY(afternoon_mechanic_id) REFERENCES users(id),
+      FOREIGN KEY(night_mechanic_id) REFERENCES users(id)
+    )
+  `, (err) => {
+    if (err) console.error('❌ daily_watch_assignment_v2:', err);
+    else console.log('✅ Refactored Daily Assignment table');
+  });
+
+  console.log('\n✅ All Professional TIER 1 tables created!\n');
 });
 
 module.exports = db;

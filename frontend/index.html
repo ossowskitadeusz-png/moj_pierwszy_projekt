@@ -10,6 +10,7 @@
   
   <!-- CSS MODUŁÓW -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
   <!-- LOGIN PAGE (hidden by default) -->
@@ -91,6 +92,15 @@
         <a href="#" onclick="app.navigate('reports')" class="nav-item" id="nav-reports">
           <i class="fa-solid fa-file-excel"></i> Reports & Excel
         </a>
+        <a href="#" onclick="app.navigate('watch')" class="nav-item" id="nav-watch">
+          <i class="fa-solid fa-clock"></i> Watch Command
+        </a>
+        <a href="#" onclick="app.navigate('crew')" class="nav-item" id="nav-crew">
+          <i class="fa-solid fa-users"></i> Crew Manifest
+        </a>
+        <a href="#" onclick="app.navigate('watchAssignments')" class="nav-item" id="nav-watchAssignments">
+          <i class="fa-solid fa-users-gear"></i> Watch Assignments
+        </a>
         <a href="#" onclick="app.navigate('approval')" class="nav-item" id="approvalNav" style="display: none;">
           <i class="fa-solid fa-clipboard-check"></i> Approvals
         </a>
@@ -123,87 +133,145 @@
       </header>
 
       <div class="content-wrapper">
-        <!-- DASHBOARD PAGE -->
-        <section id="dashboardPage" class="page">
-          <div class="dashboard-grid">
-            <div class="stat-card">
-              <div class="stat-icon"><i class="fa-solid fa-tasks"></i></div>
-              <div class="stat-content">
-                <h3 id="statTasksTitle">My Work Orders</h3>
-                <p class="stat-number" id="statMyTasks">0</p>
+        <!-- WELCOME DASHBOARD PAGE -->
+        <section id="dashboardPage" class="page active">
+          <div class="welcome-container">
+            <!-- Left: Welcome Card -->
+            <div class="welcome-card">
+              <div class="welcome-header">
+                <div class="welcome-icon">⚓</div>
+                <h1>Welcome, <span id="userGreeting">Engineer</span>!</h1>
               </div>
-            </div>
-            <div class="stat-card yellow">
-              <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
-              <div class="stat-content">
-                <h3>Pending</h3>
-                <p class="stat-number" id="statPending">0</p>
+
+              <div class="welcome-message">
+                <p id="greetingMessage">Good morning!</p>
+                <p class="subtitle">Engine Room Command Center</p>
               </div>
-            </div>
-            
-            <!-- CHIEF SPECIFIC WIDGETS -->
-            <div class="stat-card blue" id="chiefStatCrew" style="display: none;">
-              <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-              <div class="stat-content">
-                <h3>Total Crew</h3>
-                <p class="stat-number" id="statCrew">0</p>
+
+              <div class="dashboard-stats">
+                <div class="stat-card">
+                  <span class="stat-icon">🚢</span>
+                  <div class="stat-info">
+                    <span class="stat-label">Vessel Status</span>
+                    <span class="stat-value" id="vesselStatus">At Sea</span>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <span class="stat-icon">🕗</span>
+                  <div class="stat-info">
+                    <span class="stat-label">On Watch</span>
+                    <span class="stat-value" id="watchStatus">Morning Watch</span>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <span class="stat-icon">🔔</span>
+                  <div class="stat-info">
+                    <span class="stat-label">Alerts</span>
+                    <span class="stat-value" id="alertCount">0</span>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <span class="stat-icon">⚙️</span>
+                  <div class="stat-info">
+                    <span class="stat-label">Engine Status</span>
+                    <span class="stat-value" id="engineStatus">Running</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="stat-card red" id="chiefStatAlerts" style="display: none;">
-              <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              <div class="stat-content">
-                <h3>Active Alerts</h3>
-                <p class="stat-number" id="statAlertsCount">0</p>
+
+              <div class="quick-actions">
+                <button onclick="app.navigate('watch')" class="quick-btn">
+                  <i class="fa-solid fa-clock"></i>
+                  <span>Watch Schedule</span>
+                </button>
+                <button onclick="app.navigate('resources')" class="quick-btn">
+                  <i class="fa-solid fa-gas-pump"></i>
+                  <span>Resources</span>
+                </button>
+                <button onclick="app.navigate('reports')" class="quick-btn">
+                  <i class="fa-solid fa-file-invoice"></i>
+                  <span>Reports</span>
+                </button>
+                <button onclick="app.navigate('tasks')" class="quick-btn">
+                  <i class="fa-solid fa-tools"></i>
+                  <span>Maintenance</span>
+                </button>
               </div>
             </div>
 
-            <!-- MECHANIC WIDGETS -->
-            <div class="stat-card blue mechanic-only">
-              <div class="stat-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-              <div class="stat-content">
-                <h3>In Progress</h3>
-                <p class="stat-number" id="statInProgress">0</p>
+            <!-- Right: Clock & Calendar -->
+            <div class="clock-container">
+              <!-- Digital Clock -->
+              <div class="digital-clock">
+                <div class="clock-display">
+                  <span id="clockHours">00</span>
+                  <span class="clock-separator">:</span>
+                  <span id="clockMinutes">00</span>
+                  <span class="clock-separator">:</span>
+                  <span id="clockSeconds">00</span>
+                </div>
+                <div class="clock-period">
+                  <span id="clockPeriod">AM</span>
+                </div>
               </div>
-            </div>
-            <div class="stat-card green mechanic-only">
-              <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
-              <div class="stat-content">
-                <h3>Completed</h3>
-                <p class="stat-number" id="statCompleted">0</p>
+
+              <!-- Calendar Info -->
+              <div class="calendar-info">
+                <span id="dayOfWeek">Monday</span>
+                <span id="fullDate">January 01, 2024</span>
+              </div>
+
+              <!-- Analog Clock (SVG) -->
+              <div class="analog-clock-container">
+                <svg class="analog-clock" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="95" fill="none" stroke="#3a4060" stroke-width="2"/>
+                  <circle cx="100" cy="100" r="5" fill="#00d4ff"/>
+                  <line id="hourHand" x1="100" y1="100" x2="100" y2="55" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                  <line id="minuteHand" x1="100" y1="100" x2="100" y2="35" stroke="#00d4ff" stroke-width="3" stroke-linecap="round"/>
+                  <line id="secondHand" x1="100" y1="100" x2="100" y2="25" stroke="#ff4d4d" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <!-- Current Phase Badge -->
+              <div class="footer-section" style="width: 100%; border-left: 4px solid #00d4ff;">
+                <h3>Current Phase</h3>
+                <div id="dashboardPhaseName" style="font-size: 18px; font-weight: bold; color: #fff;">Morning Watch</div>
+                <div id="dashboardPhaseTime" style="font-size: 13px; color: #888;">08:00 - 10:00</div>
               </div>
             </div>
           </div>
 
-          <!-- CHIEF DASHBOARD SECTIONS -->
-          <div id="chiefDashboardSections" style="display: none;">
-            <div class="dashboard-grid" style="margin-top: 20px;">
-              <div class="dashboard-section card" style="flex: 1;">
-                <h2>Crew Status</h2>
-                <div id="crewStatusWidget">Loading...</div>
-              </div>
-              <div class="dashboard-section card" style="flex: 2;">
-                <h2>Resources Monitor</h2>
-                <div id="resourcesWidget" class="resources-grid">Loading...</div>
+          <!-- Bottom: Quick Info Section -->
+          <div class="dashboard-footer">
+            <div class="footer-section">
+              <h3>📌 Today's Watch Team</h3>
+              <div id="todayWatchInfo" class="watch-info-grid">
+                <!-- Populated by JS -->
               </div>
             </div>
-            <div class="dashboard-section card" style="margin-top: 20px;">
-              <h2>Critical Alerts</h2>
-              <div id="recentAlerts">Loading...</div>
-            </div>
-          </div>
 
-          <!-- MECHANIC REPORTS SECTION -->
-          <div id="mechanicReportsSection" class="dashboard-section card mechanic-only" style="margin-top: 20px; display: none;">
-            <h2>📋 Pending Inventory Reports</h2>
-            <div id="pendingReportsWidget" class="reports-grid">
-              <p class="placeholder">Loading reports...</p>
+            <div class="footer-section">
+              <h3>⚠️ Recent Alerts</h3>
+              <div id="activeAlerts" class="alerts-list">
+                <div class="alert-item info">System operational. No active alerts.</div>
+              </div>
             </div>
-          </div>
 
-          <div class="dashboard-section card" id="recentActivityCard" style="margin-top: 20px;">
-            <h2>Recent Activity</h2>
-            <div id="recentActivityList" class="activity-list">
-              <p class="placeholder">No recent activity...</p>
+            <div class="footer-section">
+              <h3>📊 Vessel Telemetry</h3>
+              <div class="health-indicators">
+                <div class="health-item">
+                  <span class="health-label">HFO Temp</span>
+                  <span class="health-value status-normal">🟢 85°C</span>
+                </div>
+                <div class="health-item">
+                  <span class="health-label">ME Load</span>
+                  <span class="health-value status-normal">🟢 78%</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -646,6 +714,85 @@
           </div>
         </div>
 
+        <!-- WATCH ASSIGNMENTS PAGE (Chief Only) -->
+        <section id="watchAssignmentsPage" class="page" style="display: none;">
+          <div class="page-header">
+            <h2>👥 Engine Room Crew Management</h2>
+            <button onclick="watchCrew.saveAssignments()" class="btn-primary">💾 Save All Assignments</button>
+          </div>
+
+          <div class="crew-assignments-grid">
+            <!-- WATCH 1 -->
+            <div class="card assignment-card">
+              <div class="assignment-badge">Watch 1</div>
+              <div class="form-group">
+                <label>Duty Engineer (Mechanic)</label>
+                <select id="mech1_select" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label>Assigned Dayman</label>
+                <select id="day1_select" class="form-control"></select>
+              </div>
+            </div>
+
+            <!-- WATCH 2 -->
+            <div class="card assignment-card">
+              <div class="assignment-badge">Watch 2</div>
+              <div class="form-group">
+                <label>Duty Engineer (Mechanic)</label>
+                <select id="mech2_select" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label>Assigned Dayman</label>
+                <select id="day2_select" class="form-control"></select>
+              </div>
+            </div>
+
+            <!-- WATCH 3 -->
+            <div class="card assignment-card">
+              <div class="assignment-badge">Watch 3</div>
+              <div class="form-group">
+                <label>Duty Engineer (Mechanic)</label>
+                <select id="mech3_select" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label>Assigned Dayman</label>
+                <select id="day3_select" class="form-control"></select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- WATCH MANAGEMENT PAGE -->
+        <section id="watchPage" class="page" style="display: none;">
+          <div class="watch-grid">
+            <div class="card watch-main-card">
+              <div class="watch-header-flex">
+                <h3 id="watchPhaseName">Morning Watch</h3>
+                <span id="watchPhaseTime" class="time-range">07:30 - 08:00</span>
+              </div>
+              <p id="watchPhaseTask" class="task-desc">Dayman Checklist + Parameters</p>
+              <div class="progress-container">
+                <div id="watchPhaseProgress" class="progress-bar"></div>
+              </div>
+            </div>
+
+            <div class="card action-card">
+              <h3>⚡ Quick Actions</h3>
+              <div id="watchActiveActions" class="actions-flex">
+                <!-- Buttons like "Fill Noon Log" -->
+              </div>
+            </div>
+
+            <div class="card rotation-card">
+              <h3>👥 Duty Rotation</h3>
+              <table class="rotation-table">
+                <tbody id="watchAssignmentsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <!-- REPORTS PAGE (dla Crew & Chief) -->
         <section id="reportsPage" class="page" style="display: none;">
           <div class="reports-header">
@@ -929,6 +1076,8 @@
   <script src="js/modules/approval.js"></script>
   <script src="js/modules/resources.js"></script>
   <script src="js/modules/reports.js"></script>
+  <script src="js/modules/watch.js"></script>
+  <script src="js/modules/crewMgmt.js"></script>
   
   <!-- GŁÓWNA APLIKACJA -->
   <script src="js/app.js"></script>

@@ -22,6 +22,8 @@ const usersRoutes = require('./routes/users.routes');
 const chiefRoutes = require('./routes/chief.routes');
 const resourcesRoutes = require('./routes/resources.routes');
 const reportsRoutes = require('./routes/reports.routes');
+const watchManagementRoutes = require('./routes/watch-management.routes');
+const crewRoutes = require('./routes/crew.routes');
 
 // ===== REJESTRACJA ROUTES =====
 app.use('/api/auth', authRoutes);
@@ -32,6 +34,8 @@ app.use('/api/users', usersRoutes);
 app.use('/api/chief', chiefRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/watch-management', watchManagementRoutes);
+app.use('/api/crew', crewRoutes);
 
 // ===== CATCH-ALL: Serwuj SPA =====
 app.get('*', (req, res) => {
